@@ -101,9 +101,29 @@
     <script type="text/babel">
       const { useEffect, useMemo, useRef, useState } = React;
 
+      // ---------- Hero Image ----------
+      // ✅ 把立山連峰照片放在 index.html 同資料夾，取名 tateyama.jpg
+      // 或改成線上圖片 URL
+      const HERO_IMAGE = "https://www.info-toyama.com/storage/special_features/339/responsive_images/U0rmlSsFfDZfqLX5S080ZdXPtjr7kmOIBCMTiwu7__1169_779.jpeg";
+
       // ---------- Helpers ----------
       const cx = (...args) => args.filter(Boolean).join(" ");
       const fmtInt = (n) => new Intl.NumberFormat("zh-TW").format(Math.round(n || 0));
+
+      function loadJSON(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return fallback;
+          return JSON.parse(raw);
+        } catch {
+          return fallback;
+        }
+      }
+      function saveJSON(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch {}
+      }
 
       // ---------- Trip Days ----------
       const TRIP_DAYS = [
@@ -115,13 +135,12 @@
       ];
 
       // ---------- Locations for Weather (per day) ----------
-      // 依行程大略選擇當天主要城市（你之後要更精準我也可以再調）
       const LOC_BY_DAY = {
         "2026-01-01": { name: "金澤", lat: 36.5613, lon: 136.6562 },
         "2026-01-02": { name: "高山", lat: 36.1333, lon: 137.25 },
         "2026-01-03": { name: "富山", lat: 36.696, lon: 137.214 },
         "2026-01-04": { name: "金澤", lat: 36.5613, lon: 136.6562 },
-        "2026-01-05": { name: "小松", lat: 36.3946, lon: 136.4066 }, // 小松機場附近
+        "2026-01-05": { name: "小松", lat: 36.3946, lon: 136.4066 },
       };
 
       // ---------- Category visual system ----------
@@ -133,7 +152,7 @@
       };
 
       // ---------- Schedule Data ----------
-      const SCHEDULE = {
+      const INITIAL_SCHEDULE = {
         "2026-01-01": [
           {
             id: "d1-1",
@@ -233,21 +252,47 @@
           addressJa: "〒920-0909 石川県金沢市袋町2-1",
           addressEn: "2-1 Fukuromachi, Kanazawa-shi, Ishikawa 920-0909, Japan",
           phone: "+81-76-210-0270",
-          img: "https://images.unsplash.com/photo-1501117716987-c8e1ecb21000?auto=format&fit=crop&w=1200&q=70",
           checkin: "15:00",
           checkout: "11:00",
         },
       };
 
       // ---------- UI Primitives ----------
-      function TopBar({ title, subtitle }) {
+      function Hero() {
         return (
-          <div className="safe-t sticky top-0 z-30 bg-sand-50/85 backdrop-blur-md">
-            <div className="mx-auto max-w-md px-4 pt-2 pb-3">
+          <div className="relative mx-auto max-w-md">
+            <div className="safe-t" />
+            <div className="relative h-52 overflow-hidden">
+              <img
+                src={HERO_IMAGE}
+                alt="立山連峰"
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-sand-50 via-black/10 to-black/25" />
+              <div className="absolute left-4 bottom-4 right-4">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/75 px-3 py-1 text-xs font-semibold text-sand-800 ring-1 ring-white/70 backdrop-blur">
+                  🏔️ 立山連峰
+                </div>
+                <div className="mt-2 text-2xl font-semibold tracking-tight text-white drop-shadow">
+                  2025日本北陸旅行
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function TopBar({ subtitle }) {
+        return (
+          <div className="sticky top-0 z-30 bg-sand-50/88 backdrop-blur-md">
+            <div className="mx-auto max-w-md px-4 pt-3 pb-3">
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <div className="text-[13px] text-sand-600">{subtitle}</div>
-                  <div className="text-xl font-semibold tracking-tight">{title}</div>
+                  <div className="text-xl font-semibold tracking-tight">2025日本北陸旅行</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="rounded-full bg-white shadow-soft px-3 py-1 text-[12px] text-sand-700 ring-1 ring-sand-100">
@@ -344,9 +389,8 @@
         );
       }
 
-      // ---------- Weather (Real API: Open-Meteo) ----------
+      // ---------- Weather (Open-Meteo) ----------
       function codeToText(code) {
-        // Open-Meteo weathercode mapping (subset; enough for daily forecast)
         const m = {
           0: { icon: "☀️", label: "晴" },
           1: { icon: "🌤️", label: "大致晴" },
@@ -419,9 +463,7 @@
             }
           })();
 
-          return () => {
-            aborted = true;
-          };
+          return () => { aborted = true; };
         }, [dayKey]);
 
         return (
@@ -527,10 +569,22 @@
         );
       }
 
-      function ScheduleTab() {
+      function ScheduleTab({ scheduleByDay, updateNote }) {
         const [dayKey, setDayKey] = useState(TRIP_DAYS[0].key);
         const [selectedItem, setSelectedItem] = useState(null);
-        const items = SCHEDULE[dayKey] ?? [];
+        const items = scheduleByDay[dayKey] ?? [];
+
+        const [noteDraft, setNoteDraft] = useState("");
+        useEffect(() => {
+          if (!selectedItem) return;
+          setNoteDraft(selectedItem.note || "");
+        }, [selectedItem]);
+
+        const onSaveNote = () => {
+          if (!selectedItem) return;
+          updateNote(dayKey, selectedItem.id, noteDraft);
+          setSelectedItem((s) => (s ? { ...s, note: noteDraft } : s));
+        };
 
         return (
           <div className="mx-auto max-w-md px-4 pb-28 pt-4">
@@ -571,8 +625,28 @@
                   </div>
 
                   <Card className="p-3">
-                    <div className="text-xs text-sand-500">備註</div>
-                    <div className="mt-1 text-sm text-sand-800 leading-relaxed">{selectedItem.note || "（尚未填寫）"}</div>
+                    <div className="text-xs text-sand-500">備註（可編輯）</div>
+                    <textarea
+                      value={noteDraft}
+                      onChange={(e) => setNoteDraft(e.target.value)}
+                      rows={4}
+                      placeholder="例如：要買的東西、集合時間提醒、備用方案…"
+                      className="mt-2 w-full rounded-2xl bg-white px-3 py-3 text-sm leading-relaxed ring-1 ring-sand-100 focus:outline-none"
+                    />
+                    <div className="mt-2 flex gap-2">
+                      <button
+                        onClick={onSaveNote}
+                        className="flex-1 rounded-2xl bg-moss-600 px-4 py-3 text-sm font-semibold text-white shadow-soft hover:bg-moss-700"
+                      >
+                        儲存備註
+                      </button>
+                      <button
+                        onClick={() => setNoteDraft(selectedItem.note || "")}
+                        className="flex-1 rounded-2xl bg-white px-4 py-3 text-sm font-semibold shadow-soft ring-1 ring-sand-100 hover:bg-sand-50"
+                      >
+                        還原
+                      </button>
+                    </div>
                   </Card>
 
                   <div className="flex gap-2">
@@ -587,12 +661,6 @@
                     >
                       打開地圖
                     </a>
-                    <button
-                      onClick={() => navigator.clipboard?.writeText(`${selectedItem.time} ${selectedItem.title} @ ${selectedItem.place}`)}
-                      className="flex-1 rounded-2xl bg-white px-4 py-3 text-sm font-semibold shadow-soft ring-1 ring-sand-100 hover:bg-sand-50"
-                    >
-                      複製摘要
-                    </button>
                   </div>
                 </div>
               )}
@@ -602,39 +670,6 @@
       }
 
       // ---------- Bookings Tab ----------
-      function InfoCardImmigration() {
-        return (
-          <Card className="p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="text-sm text-sand-600">入境資料（快速清單）</div>
-                <div className="mt-1 text-base font-semibold">Visit Japan Web / 入境與海關</div>
-              </div>
-              <div className="rounded-full bg-sand-50 px-3 py-1 text-xs font-semibold ring-1 ring-sand-100">出發前準備</div>
-            </div>
-
-            <div className="mt-3 grid grid-cols-1 gap-2">
-              {[
-                "護照（有效期確認）",
-                "回程機票/電子機票",
-                "第一晚住宿資訊（飯店名稱/地址/電話）",
-                "同行人資訊（姓名/關係，如需要）",
-                "緊急聯絡方式",
-              ].map((t, i) => (
-                <div key={i} className="flex items-start gap-2 rounded-2xl bg-sand-50 px-3 py-3 ring-1 ring-sand-100">
-                  <div className="mt-0.5 text-sand-500">□</div>
-                  <div className="text-sm text-sand-800">{t}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-3 text-xs text-sand-500">
-              小提醒：你可以把下面飯店地址/電話直接複製貼到入境或寄行李表單。
-            </div>
-          </Card>
-        );
-      }
-
       function BoardingPass({ flight, direction }) {
         const isGo = direction === "go";
         const from = isGo ? flight.from : flight.to;
@@ -689,62 +724,43 @@
         );
       }
 
-      function HotelCard({ hotel }) {
+      function HotelCardLite({ hotel }) {
         return (
-          <Card className="overflow-hidden">
-            <div className="relative h-36">
-              <img src={hotel.img} alt="hotel" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
-              <div className="absolute left-4 bottom-3">
-                <div className="text-xs text-white/80">住宿</div>
-                <div className="text-lg font-semibold text-white">{hotel.name}</div>
+          <Card className="p-4 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="text-sm text-sand-600">住宿</div>
+                <div className="mt-1 text-base font-semibold">{hotel.name}</div>
+              </div>
+              <div className="rounded-2xl bg-sand-50 px-3 py-2 ring-1 ring-sand-100 text-right">
+                <div className="text-[11px] text-sand-500">Check-in / out</div>
+                <div className="mt-0.5 text-sm font-semibold">{hotel.checkin} / {hotel.checkout}</div>
               </div>
             </div>
 
-            <div className="p-4 space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-2xl bg-sand-50 p-3 ring-1 ring-sand-100">
-                  <div className="text-xs text-sand-500">Check-in</div>
-                  <div className="mt-1 text-sm font-semibold">{hotel.checkin}</div>
-                </div>
-                <div className="rounded-2xl bg-sand-50 p-3 ring-1 ring-sand-100">
-                  <div className="text-xs text-sand-500">Check-out</div>
-                  <div className="mt-1 text-sm font-semibold">{hotel.checkout}</div>
-                </div>
-              </div>
-
-              <div className="rounded-2xl bg-white p-3 ring-1 ring-sand-100">
-                <div className="text-xs text-sand-500">住所（日本語）</div>
-                <div className="mt-1 text-sm text-sand-800">{hotel.addressJa}</div>
-              </div>
-
-              <div className="rounded-2xl bg-white p-3 ring-1 ring-sand-100">
-                <div className="text-xs text-sand-500">Address (English)</div>
-                <div className="mt-1 text-sm text-sand-800">{hotel.addressEn}</div>
-              </div>
-
-              <div className="rounded-2xl bg-white p-3 ring-1 ring-sand-100">
-                <div className="text-xs text-sand-500">電話 / Phone</div>
-                <div className="mt-1 text-sm font-semibold text-sand-800">{hotel.phone}</div>
-              </div>
-
-              <div className="flex gap-2">
-                <a
-                  href={hotel.map}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-1 rounded-2xl bg-moss-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-soft hover:bg-moss-700"
-                >
-                  打開地圖
-                </a>
-                <button
-                  onClick={() => navigator.clipboard?.writeText(`${hotel.name}\n${hotel.addressJa}\n${hotel.addressEn}\n${hotel.phone}`)}
-                  className="flex-1 rounded-2xl bg-white px-4 py-3 text-sm font-semibold shadow-soft ring-1 ring-sand-100 hover:bg-sand-50"
-                >
-                  複製住宿資訊
-                </button>
-              </div>
+            <div className="rounded-2xl bg-white p-3 ring-1 ring-sand-100">
+              <div className="text-xs text-sand-500">住所（日本語）</div>
+              <div className="mt-1 text-sm text-sand-800">{hotel.addressJa}</div>
             </div>
+
+            <div className="rounded-2xl bg-white p-3 ring-1 ring-sand-100">
+              <div className="text-xs text-sand-500">Address (English)</div>
+              <div className="mt-1 text-sm text-sand-800">{hotel.addressEn}</div>
+            </div>
+
+            <div className="rounded-2xl bg-white p-3 ring-1 ring-sand-100">
+              <div className="text-xs text-sand-500">電話 / Phone</div>
+              <div className="mt-1 text-sm font-semibold text-sand-800">{hotel.phone}</div>
+            </div>
+
+            <a
+              href={hotel.map}
+              target="_blank"
+              rel="noreferrer"
+              className="block w-full rounded-2xl bg-moss-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-soft hover:bg-moss-700"
+            >
+              打開地圖
+            </a>
           </Card>
         );
       }
@@ -754,8 +770,6 @@
 
         return (
           <div className="mx-auto max-w-md px-4 pb-28 pt-4 space-y-4">
-            <InfoCardImmigration />
-
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-sand-600">機票</div>
@@ -767,18 +781,96 @@
             <BoardingPass flight={bookings.flight} direction="go" />
             <BoardingPass flight={bookings.flight} direction="back" />
 
-            <div className="pt-2">
-              <div className="text-sm text-sand-600">住宿</div>
-              <div className="text-base font-semibold">SOKI KANAZAWA</div>
-            </div>
-
-            <HotelCard hotel={bookings.hotel} />
+            <HotelCardLite hotel={bookings.hotel} />
           </div>
         );
       }
 
       // ---------- Expense Tab ----------
       const PEOPLE = ["沈", "瑄", "YO"];
+
+      // ✅ 你要的算法：逐筆欠款 → 兩兩互相抵銷（符合你舉例）
+      function computeSettlement(entries) {
+        // 1) 逐筆累積「誰欠誰」：debts[from][to] += amount
+        const debts = Object.fromEntries(
+          PEOPLE.map((from) => [
+            from,
+            Object.fromEntries(PEOPLE.map((to) => [to, 0])),
+          ])
+        );
+
+        for (const e of entries) {
+          const payer = e.payer;
+          for (const p of PEOPLE) {
+            if (p === payer) continue;
+            const amt = Number(e.allocations?.[p] || 0);
+            debts[p][payer] += amt; // p 欠 payer
+          }
+        }
+
+        // 2) 兩兩互相抵銷（pairwise netting）
+        const net = Object.fromEntries(
+          PEOPLE.map((from) => [
+            from,
+            Object.fromEntries(PEOPLE.map((to) => [to, 0])),
+          ])
+        );
+
+        for (let i = 0; i < PEOPLE.length; i++) {
+          for (let j = i + 1; j < PEOPLE.length; j++) {
+            const a = PEOPLE[i];
+            const b = PEOPLE[j];
+            const aToB = debts[a][b];
+            const bToA = debts[b][a];
+            const diff = aToB - bToA;
+
+            if (diff > 0) {
+              net[a][b] = diff; // a 欠 b
+              net[b][a] = 0;
+            } else if (diff < 0) {
+              net[b][a] = -diff; // b 欠 a
+              net[a][b] = 0;
+            } else {
+              net[a][b] = 0;
+              net[b][a] = 0;
+            }
+          }
+        }
+
+        // 3) incoming[to][from]：from 要給 to 多少（用於長條下方顯示）
+        const incoming = Object.fromEntries(
+          PEOPLE.map((to) => [
+            to,
+            Object.fromEntries(PEOPLE.map((from) => [from, 0])),
+          ])
+        );
+
+        for (const from of PEOPLE) {
+          for (const to of PEOPLE) {
+            incoming[to][from] = net[from][to];
+          }
+        }
+
+        // 4) transfers（條列版）
+        const transfers = [];
+        for (const from of PEOPLE) {
+          for (const to of PEOPLE) {
+            const amount = net[from][to];
+            if (from !== to && amount > 0) transfers.push({ from, to, amount });
+          }
+        }
+
+        // 5) 額外算 paid/owed/balance（保留可能需要）
+        const paid = Object.fromEntries(PEOPLE.map((p) => [p, 0]));
+        const owed = Object.fromEntries(PEOPLE.map((p) => [p, 0]));
+        for (const e of entries) {
+          paid[e.payer] += Number(e.total || 0);
+          for (const p of PEOPLE) owed[p] += Number(e.allocations?.[p] || 0);
+        }
+        const balance = Object.fromEntries(PEOPLE.map((p) => [p, paid[p] - owed[p]]));
+
+        return { paid, owed, balance, transfers, incoming };
+      }
 
       function ExpenseTab() {
         const [entries, setEntries] = useState([
@@ -788,7 +880,7 @@
             title: "利木津巴士車票",
             payer: "沈",
             total: 3400,
-            allocations: { 沈: 1134, 瑄: 1133, YO: 1133 }, // 示例：可不平均
+            allocations: { 沈: 1134, 瑄: 1133, YO: 1133 },
           },
           {
             id: "e2",
@@ -796,7 +888,7 @@
             title: "無印良品",
             payer: "沈",
             total: 5000,
-            allocations: { 沈: 500, 瑄: 4000, YO: 500 }, // 你舉的例子
+            allocations: { 沈: 2000, 瑄: 2000, YO: 1000 },
           },
         ]);
 
@@ -814,23 +906,13 @@
           return m;
         }, [entries]);
 
+        const settlement = useMemo(() => computeSettlement(entries), [entries]);
+
         const dashboard = useMemo(() => {
           const values = PEOPLE.map((p) => totalsByPayer[p] || 0);
           const max = Math.max(1, ...values);
           const sum = values.reduce((a, b) => a + b, 0);
-          const avg = sum / PEOPLE.length;
-
-          const diffs = PEOPLE.map((p) => ({
-            name: p,
-            value: totalsByPayer[p] || 0,
-            diffFromAvg: (totalsByPayer[p] || 0) - avg,
-          }));
-
-          const sorted = [...diffs].sort((a, b) => a.value - b.value);
-          const suggestedNext = sorted[0]; // 目前代墊最少的人
-          const gap = sorted[sorted.length - 1].value - sorted[0].value;
-
-          return { values, max, sum, avg, diffs, suggestedNext, gap };
+          return { values, max, sum };
         }, [totalsByPayer]);
 
         const grouped = useMemo(() => {
@@ -845,14 +927,9 @@
 
         const formNums = useMemo(() => {
           const total = Number(form.total || 0);
-          const alloc = {};
           let allocSum = 0;
-          for (const p of PEOPLE) {
-            const v = Number(form.allocations[p] || 0);
-            alloc[p] = v;
-            allocSum += v;
-          }
-          return { total, alloc, allocSum, remaining: total - allocSum };
+          for (const p of PEOPLE) allocSum += Number(form.allocations[p] || 0);
+          return { total, allocSum, remaining: total - allocSum };
         }, [form]);
 
         const setAlloc = (name, value) => {
@@ -862,14 +939,37 @@
           }));
         };
 
+        const splitEven = () => {
+          const total = Number(form.total || 0);
+          if (!total || total <= 0) return alert("請先輸入總金額（> 0）");
+
+          const base = Math.floor(total / PEOPLE.length);
+          const rem = total - base * PEOPLE.length;
+
+          // ✅ 規則：除不盡時，付款人（代墊者）分到比較少的那 1～2 元
+          // 作法：先全部 base；把 rem 優先加到非付款人
+          const payer = form.payer;
+          const others = PEOPLE.filter((p) => p !== payer);
+
+          const alloc = Object.fromEntries(PEOPLE.map((p) => [p, base]));
+          for (let k = 0; k < rem; k++) {
+            const target = others[k % others.length] || payer;
+            alloc[target] += 1;
+          }
+
+          setForm((f) => ({
+            ...f,
+            allocations: Object.fromEntries(PEOPLE.map((p) => [p, String(alloc[p])])),
+          }));
+        };
+
         const addEntry = () => {
           const total = Number(form.total);
           if (!total || total <= 0) return alert("請輸入總金額（> 0）");
           if (!form.title.trim()) return alert("請輸入項目名稱");
 
-          const { allocSum } = formNums;
-          if (allocSum !== total) {
-            return alert(`分配金額加總必須等於總金額。\n目前加總：${allocSum}，總金額：${total}`);
+          if (formNums.allocSum !== total) {
+            return alert(`分配金額加總必須等於總金額。\n目前加總：${formNums.allocSum}，總金額：${total}`);
           }
 
           const id = "e" + Math.random().toString(16).slice(2);
@@ -892,6 +992,13 @@
 
         const removeEntry = (id) => setEntries((prev) => prev.filter((e) => e.id !== id));
 
+        const lineForPayer = (to) => {
+          const parts = PEOPLE
+            .filter((from) => from !== to)
+            .map((from) => `${from}要給${to} ¥${fmtInt(settlement.incoming?.[to]?.[from] || 0)}`);
+          return parts.join("、");
+        };
+
         return (
           <div className="mx-auto max-w-md px-4 pb-28 pt-4 space-y-4">
             {/* Dashboard */}
@@ -907,23 +1014,21 @@
                 </div>
               </div>
 
-              <div className="mt-4 space-y-3">
-                {dashboard.diffs.map((d) => {
-                  const pct = Math.round((d.value / dashboard.max) * 100);
+              <div className="mt-4 space-y-4">
+                {PEOPLE.map((name) => {
+                  const value = totalsByPayer[name] || 0;
+                  const pct = Math.round((value / dashboard.max) * 100);
                   return (
-                    <div key={d.name}>
+                    <div key={name}>
                       <div className="flex items-center justify-between">
-                        <div className="text-sm font-semibold">{d.name}</div>
-                        <div className="text-sm font-semibold">¥ {fmtInt(d.value)}</div>
+                        <div className="text-sm font-semibold">{name}</div>
+                        <div className="text-sm font-semibold">¥ {fmtInt(value)}</div>
                       </div>
                       <div className="mt-2 h-3 rounded-full bg-sand-100 ring-1 ring-sand-200 overflow-hidden">
                         <div className="h-full rounded-full bg-moss-600" style={{ width: pct + "%" }} />
                       </div>
-                      <div className="mt-1 text-xs text-sand-600">
-                        與平均（¥ {fmtInt(dashboard.avg)}）差距：
-                        <span className={cx("ml-1 font-semibold", d.diffFromAvg >= 0 ? "text-clay-700" : "text-moss-700")}>
-                          {d.diffFromAvg >= 0 ? "+" : "−"}¥ {fmtInt(Math.abs(d.diffFromAvg))}
-                        </span>
+                      <div className="mt-2 text-xs text-sand-700 leading-relaxed">
+                        {lineForPayer(name)}
                       </div>
                     </div>
                   );
@@ -931,10 +1036,19 @@
               </div>
 
               <div className="mt-4 rounded-2xl bg-white p-3 ring-1 ring-sand-100">
-                <div className="text-xs text-sand-500">建議</div>
+                <div className="text-xs text-sand-500">結算小卡</div>
                 <div className="mt-1 text-sm text-sand-800 leading-relaxed">
-                  目前代墊差距約 <span className="font-semibold">¥ {fmtInt(dashboard.gap)}</span>。
-                  接下來幾筆如果由 <span className="font-semibold">{dashboard.suggestedNext.name}</span> 先代墊，會讓最後結算更平均、比較不麻煩。
+                  {settlement.transfers.length === 0 ? (
+                    <span className="font-semibold">目前剛好打平，不用互轉。</span>
+                  ) : (
+                    <div className="space-y-1">
+                      {settlement.transfers.map((t, idx) => (
+                        <div key={idx}>
+                          <span className="font-semibold">{t.from}</span> → <span className="font-semibold">{t.to}</span>：¥ {fmtInt(t.amount)}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
@@ -1023,18 +1137,20 @@
                     ))}
                   </div>
 
-                  <div className="mt-2 text-xs text-sand-500">
-                    小技巧：像「無印良品 5000」這種，你就把瑄填 4000、YO 填 500、沈填 500。
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <button
+                      onClick={splitEven}
+                      className="w-full rounded-2xl bg-white px-4 py-3 text-sm font-semibold shadow-soft ring-1 ring-sand-100 hover:bg-sand-50"
+                    >
+                      一鍵平分
+                    </button>
+                    <button
+                      onClick={addEntry}
+                      className="w-full rounded-2xl bg-moss-600 px-4 py-3 text-sm font-semibold text-white shadow-soft hover:bg-moss-700"
+                    >
+                      新增到列表
+                    </button>
                   </div>
-                </div>
-
-                <div className="col-span-2">
-                  <button
-                    onClick={addEntry}
-                    className="w-full rounded-2xl bg-moss-600 px-4 py-3 text-sm font-semibold text-white shadow-soft hover:bg-moss-700"
-                  >
-                    新增到列表
-                  </button>
                 </div>
               </div>
             </Card>
@@ -1102,20 +1218,49 @@
 
       // ---------- App Shell ----------
       function App() {
+        // Schedule state + persisted notes
+        const savedNotes = useMemo(() => loadJSON("trip_notes_map_v1", {}), []);
+        const [scheduleByDay, setScheduleByDay] = useState(() => {
+          const cloned = JSON.parse(JSON.stringify(INITIAL_SCHEDULE));
+          for (const dayKey of Object.keys(cloned)) {
+            for (const item of cloned[dayKey]) {
+              const key = `${dayKey}::${item.id}`;
+              if (savedNotes[key] != null) item.note = savedNotes[key];
+            }
+          }
+          return cloned;
+        });
+
+        const updateNote = (dayKey, itemId, note) => {
+          setScheduleByDay((prev) => {
+            const next = JSON.parse(JSON.stringify(prev));
+            const arr = next[dayKey] || [];
+            const idx = arr.findIndex((x) => x.id === itemId);
+            if (idx >= 0) arr[idx].note = note;
+            return next;
+          });
+          const key = `${dayKey}::${itemId}`;
+          const nextNotes = { ...loadJSON("trip_notes_map_v1", {}), [key]: note };
+          saveJSON("trip_notes_map_v1", nextNotes);
+        };
+
         const [tab, setTab] = useState("schedule");
 
-        const header = useMemo(() => {
-          if (tab === "schedule") return { title: "2025日本北陸旅行", subtitle: "行程" };
-          if (tab === "bookings") return { title: "2025日本北陸旅行", subtitle: "預訂" };
-          return { title: "2025日本北陸旅行", subtitle: "記帳" };
+        const subtitle = useMemo(() => {
+          if (tab === "schedule") return "行程";
+          if (tab === "bookings") return "預訂";
+          return "記帳";
         }, [tab]);
 
         return (
           <div className="min-h-screen">
-            <TopBar title={header.title} subtitle={header.subtitle} />
-            {tab === "schedule" && <ScheduleTab />}
+            <Hero />
+            <TopBar subtitle={subtitle} />
+
+            {tab === "schedule" && <ScheduleTab scheduleByDay={scheduleByDay} updateNote={updateNote} />}
             {tab === "bookings" && <BookingsTab />}
             {tab === "expense" && <ExpenseTab />}
+
             <TabBar tab={tab} setTab={setTab} />
           </div>
         );
