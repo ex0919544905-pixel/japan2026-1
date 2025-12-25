@@ -1,162 +1,1035 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>北陸冬旅 2025</title>
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#3F5B3B" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Trip Planner" />
+    <title>團體旅遊規劃 PWA</title>
+
+    <!-- Tailwind (CDN for prototype) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            boxShadow: {
+              soft: "0 10px 25px rgba(0,0,0,.08)",
+              soft2: "0 6px 18px rgba(0,0,0,.10)",
+            },
+            borderRadius: {
+              xl2: "1.25rem",
+            },
+            colors: {
+              sand: {
+                50: "#FAF7F0",
+                100: "#F3ECDD",
+                200: "#E9DEC4",
+                300: "#DCC9A2",
+                400: "#CDB07F",
+                500: "#B28E58",
+                600: "#8F6F3F",
+                700: "#6E5631",
+                800: "#4B3B22",
+                900: "#2A2115",
+              },
+              moss: {
+                50: "#F3F7F2",
+                100: "#E2EBDD",
+                200: "#C1D3B8",
+                300: "#9BB58C",
+                400: "#76966A",
+                500: "#5C7F52",
+                600: "#46623F",
+                700: "#364B30",
+                800: "#263421",
+                900: "#162012",
+              },
+              clay: {
+                50: "#FBF6F2",
+                100: "#F4E7DF",
+                200: "#EBCFBE",
+                300: "#DBB19B",
+                400: "#C98E72",
+                500: "#B56E4E",
+                600: "#8E563C",
+                700: "#6D4230",
+                800: "#4C2E22",
+                900: "#2C1B14",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- React (CDN) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <style>
-        :root {
-            --bg-color: #F8F9FA;
-            --card-bg: #FFFFFF;
-            --accent-soft: #E0E0E0;
-            --text-main: #333333;
-            --text-sub: #757575;
-            --tag-food: #FADBD8;
-            --tag-spot: #D4E6F1;
-            --tag-transport: #D5F5E3;
-            --tag-warning: #FCF3CF;
-        }
-        body {
-            font-family: "Helvetica Neue", "PingFang TC", "sans-serif";
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0; padding: 20px 15px 100px;
-            line-height: 1.6;
-        }
-        /* 日式極簡標題 */
-        .day-header {
-            border-left: 4px solid #333;
-            padding-left: 12px;
-            margin: 30px 0 15px;
-        }
-        .day-title { font-size: 1.4rem; font-weight: 600; display: block; }
-        .weather { font-size: 0.85rem; color: var(--text-sub); margin-top: 4px; }
-
-        /* 行程卡片 */
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            position: relative;
-        }
-        .time-label { font-size: 0.75rem; color: var(--text-sub); font-weight: bold; margin-bottom: 4px; }
-        .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; }
-        
-        /* 標籤設計 */
-        .tag {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-right: 5px;
-            font-weight: 500;
-        }
-        .tag-food { background: var(--tag-food); color: #C0392B; }
-        .tag-spot { background: var(--tag-spot); color: #2980B9; }
-        .tag-transport { background: var(--tag-transport); color: #27AE60; }
-        .tag-info { background: var(--tag-warning); color: #856404; }
-
-        /* 導航按鈕 */
-        .nav-btn {
-            display: inline-flex;
-            align-items: center;
-            font-size: 0.8rem;
-            color: #4285F4;
-            text-decoration: none;
-            margin-top: 10px;
-            border: 1px solid #4285F4;
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
-
-        /* 底部導覽列 */
-        .tab-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            height: 65px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid #EEE;
-            z-index: 100;
-        }
-        .tab-item { text-align: center; font-size: 0.7rem; color: var(--text-sub); text-decoration: none; }
-
-        .highlight { font-weight: bold; border-bottom: 1.5px solid #FFD700; }
+      /* iOS safe-area padding helpers */
+      .safe-b { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+      .safe-t { padding-top: max(16px, env(safe-area-inset-top)); }
+      /* subtle grain */
+      .grain::before{
+        content:"";
+        position:absolute; inset:0;
+        background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity=".06"/></svg>');
+        pointer-events:none;
+        mix-blend-mode:multiply;
+      }
+      .no-scrollbar::-webkit-scrollbar{ display:none; }
+      .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
     </style>
-</head>
-<body>
+  </head>
 
-    <div class="day-header">
-        <span class="day-title">1/1 (Thu) 出發金澤</span>
-        <div class="weather">❄️ 小松/金澤：2°C - 6°C | 降雨機率 40%</div>
-    </div>
+  <body class="bg-sand-50 text-sand-900">
+    <div id="root"></div>
 
-    <div class="card">
-        <span class="tag tag-transport">航班</span>
-        <div class="time-label">06:35 – 10:25</div>
-        <div class="card-title">長榮航空 BR158</div>
-        <div class="weather">桃園 T2 → 小松機場</div>
-        <div style="margin-top:8px; font-size:0.85rem;">
-            預約代號：<span class="highlight">#7XXXXX</span>
-        </div>
-    </div>
+    <script type="text/babel">
+      const { useEffect, useMemo, useRef, useState } = React;
 
-    <div class="card">
-        <span class="tag tag-transport">交通</span>
-        <div class="card-title">小松機場利木津巴士</div>
-        <div class="weather">機場 → 金澤站西口 (40min)</div>
-        <div style="font-size:0.85rem; color:var(--text-sub);">
-            攻略：下飛機直奔自動販賣機取票。
-        </div>
-        <a href="https://www.google.com/maps/search/小松空港+リムジンバス" class="nav-btn">📍 導航至乘車處</a>
-    </div>
+      // ---------- Helpers ----------
+      const cx = (...args) => args.filter(Boolean).join(" ");
+      const fmtMoney = (n) => new Intl.NumberFormat("zh-TW").format(Math.round(n));
+      const pad2 = (n) => String(n).padStart(2, "0");
 
-    <div class="card">
-        <span class="tag tag-food">晚餐</span>
-        <div class="card-title">片町・金澤關東煮</div>
-        <div style="font-size:0.85rem;">
-            必吃：<span class="highlight">螃蟹面 (蟹面)</span>、<span class="highlight">車麩</span><br>
-            推薦店：赤玉本店 或 菊一。
-        </div>
-        <a href="https://www.google.com/maps/search/片町+おでん" class="nav-btn">📍 導航至片町</a>
-    </div>
+      // Category visual system
+      const CATEGORY = {
+        sight: { label: "景點", pill: "bg-moss-100 text-moss-800 ring-1 ring-moss-200", dot: "bg-moss-500" },
+        food:  { label: "美食", pill: "bg-clay-100 text-clay-800 ring-1 ring-clay-200", dot: "bg-clay-500" },
+        move:  { label: "交通", pill: "bg-sand-100 text-sand-800 ring-1 ring-sand-200", dot: "bg-sand-500" },
+        stay:  { label: "住宿", pill: "bg-slate-100 text-slate-700 ring-1 ring-slate-200", dot: "bg-slate-500" },
+      };
 
-    <div class="day-header">
-        <span class="day-title">1/2 (Fri) 高山一日散策</span>
-        <div class="weather">❄️ 高山：-3°C - 4°C | 易積雪，請注意保暖</div>
-    </div>
+      const WEATHER = {
+        "2026-01-01": { icon: "☁️", label: "多雲", hi: 7, lo: 2, rain: 15 },
+        "2026-01-02": { icon: "🌤️", label: "晴時多雲", hi: 6, lo: 1, rain: 10 },
+        "2026-01-03": { icon: "🌧️", label: "小雨", hi: 5, lo: 2, rain: 55 },
+        "2026-01-04": { icon: "⛅️", label: "陰短暫晴", hi: 7, lo: 2, rain: 25 },
+        "2026-01-05": { icon: "🌤️", label: "晴", hi: 10, lo: 4, rain: 5 },
+      };
 
-    <div class="card">
-        <span class="tag tag-transport">交通</span>
-        <div class="time-label">06:51 – 09:28</div>
-        <div class="card-title">金澤 ➔ 富山 ➔ 高山</div>
-        <div style="font-size:0.85rem;">
-            新幹線 劍 60號 + 特急 飛驒 6號<br>
-            <span class="tag tag-info">重要：特急為全車指定席</span>
-        </div>
-    </div>
+      // ---------- Data (based on your text) ----------
+      const TRIP_DAYS = [
+        { key: "2026-01-01", label: "1/1（四）" },
+        { key: "2026-01-02", label: "1/2（五）" },
+        { key: "2026-01-03", label: "1/3（六）" },
+        { key: "2026-01-04", label: "1/4（日）" },
+        { key: "2026-01-05", label: "1/5（一）" },
+      ];
 
-    <div class="card">
-        <span class="tag tag-spot">景點</span>
-        <div class="card-title">高山老街・必買清單</div>
-        <div style="font-size:0.85rem;">
-            🛍️ 伴手禮：<span class="highlight">橋本煎餅堂 (現烤手繪)</span><br>
-            🥛 必吃：<span class="highlight">高山布丁亭</span>、<span class="highlight">飛驒牛握壽司</span><br>
-            🖋️ 亮點：<span class="highlight">Pen Shop IMAI</span> (職人鋼筆店)
-        </div>
-        <a href="https://www.google.com/maps/search/高山古い町並" class="nav-btn">📍 導航至老街</a>
-    </div>
+      const SCHEDULE = {
+        "2026-01-01": [
+          {
+            id: "d1-1",
+            time: "04:30",
+            title: "凌晨到機場報到（預估 4–5 點）",
+            category: "move",
+            place: "桃園國際機場 T2",
+            note: "提早到、換日幣/交通票券可一起處理。",
+            map: "https://www.google.com/maps/search/?api=1&query=桃園國際機場第二航廈",
+          },
+          {
+            id: "d1-2",
+            time: "06:35–10:25",
+            title: "✈️ 長榮 BR158 桃園二航 → 小松機場",
+            category: "move",
+            place: "TPE → KMQ",
+            note: "機上休息補眠。落地後找巴士售票機。",
+            map: "https://www.google.com/maps/search/?api=1&query=Komatsu%20Airport",
+          },
+          {
+            id: "d1-3",
+            time: "10:40",
+            title: "搭利木津巴士 → 金澤站西口（約 40 分）",
+            category: "move",
+            place: "小松機場 → 金澤站（西口）",
+            note: "先找自動販賣機取車票。",
+            map: "https://www.google.com/maps/search/?api=1&query=金澤站西口",
+          },
+          {
+            id: "d1-4",
+            time: "12:00",
+            title: "步行 5 分鐘 → 金澤 FORUS 寄行李 & 逛街",
+            category: "sight",
+            place: "Kanazawa FORUS / 金澤車站",
+            note: "中午～下午以車站周邊為主，補物資。",
+            map: "https://www.google.com/maps/search/?api=1&query=Kanazawa%20Forus",
+          },
+          {
+            id: "d1-5",
+            time: "18:30",
+            title: "片町周邊：關東煮 + 晃晃",
+            category: "food",
+            place: "片町 Katamachi",
+            note: "晚餐後散步消化，早點休息。",
+            map: "https://www.google.com/maps/search/?api=1&query=片町%20金澤",
+          },
+        ],
+        "2026-01-02": [
+          { id: "d2-1", time: "06:00", title: "起床梳洗、便利商店補給", category: "food", place: "金澤", note: "出發前買水/早餐。", map: "https://www.google.com/maps/search/?api=1&query=金澤%20便利商店" },
+          { id: "d2-2", time: "06:51–07:14", title: "🚄 新幹線 劍 Tsurugi 60：金澤 → 富山", category: "move", place: "金澤站 → 富山站", note: "準時進站，留意月台。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
+          { id: "d2-3", time: "07:58–09:28", title: "🚄 特急 飛驒 Hida 6（指定席）：富山 → 高山", category: "move", place: "富山站 → 高山站", note: "車上可補眠/看行程。", map: "https://www.google.com/maps/search/?api=1&query=Takayama%20Station" },
+          { id: "d2-4", time: "10:00", title: "Starbucks 高山岡本店", category: "food", place: "高山", note: "拍照點，暖身。", map: "https://www.google.com/maps/search/?api=1&query=スターバックス%20高山岡本店" },
+          { id: "d2-5", time: "10:40", title: "舩坂酒造店", category: "sight", place: "高山", note: "小酌試飲注意步伐。", map: "https://www.google.com/maps/search/?api=1&query=舩坂酒造店" },
+          { id: "d2-6", time: "11:10", title: "miffy おやつ堂（飛驒高山店）", category: "food", place: "高山", note: "甜點補能量。", map: "https://www.google.com/maps/search/?api=1&query=miffy%20おやつ堂%20飛騨高山店" },
+          { id: "d2-7", time: "11:40", title: "高山布丁亭 / Pen Shop IMAI / 橋本煎餅堂", category: "sight", place: "高山老街", note: "沿路逛，彈性吃午餐。", map: "https://www.google.com/maps/search/?api=1&query=高山%20古い町並" },
+          { id: "d2-8", time: "15:17–16:44", title: "🚄 特急 飛驒 Hida 11：高山 → 富山", category: "move", place: "高山站 → 富山站", note: "回程補眠。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
+          { id: "d2-9", time: "17:10", title: "🚄 新幹線（自由席）：富山 → 金澤", category: "move", place: "富山 → 金澤", note: "現場買票；人多時提早排隊。", map: "https://www.google.com/maps/search/?api=1&query=金澤站" },
+          { id: "d2-10", time: "19:00", title: "晚餐 & 休息", category: "food", place: "金澤", note: "回飯店後整理戰利品。", map: "https://www.google.com/maps/search/?api=1&query=金澤%20餐廳" },
+        ],
+        "2026-01-03": [
+          { id: "d3-1", time: "09:00–10:00", title: "早餐：東出珈琲店", category: "food", place: "金澤", note: "建議提早到避免排隊。", map: "https://www.google.com/maps/search/?api=1&query=東出珈琲店" },
+          { id: "d3-2", time: "10:30", title: "金澤 → 富山（移動）", category: "move", place: "金澤 → 富山", note: "午前～中午移動。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
+          { id: "d3-3", time: "13:00", title: "富山市區活動（彈性安排）", category: "sight", place: "富山市區", note: "依天氣/體力微調。", map: "https://www.google.com/maps/search/?api=1&query=富山市" },
+          { id: "d3-4", time: "19:00", title: "晚餐 & 休息", category: "food", place: "富山/金澤（依住宿）", note: "早睡，隔天行程較滿。", map: "https://www.google.com/maps/search/?api=1&query=富山%20餐廳" },
+        ],
+        "2026-01-04": [
+          { id: "d4-1", time: "10:00", title: "金澤 21 世紀美術館", category: "sight", place: "金澤", note: "熱門展區可先查票務/開館。", map: "https://www.google.com/maps/search/?api=1&query=21st%20Century%20Museum%20of%20Contemporary%20Art%20Kanazawa" },
+          { id: "d4-2", time: "12:00", title: "Le Musée de H", category: "food", place: "金澤", note: "甜點/咖啡。", map: "https://www.google.com/maps/search/?api=1&query=Le%20Mus%C3%A9e%20de%20H%20Kanazawa" },
+          { id: "d4-3", time: "13:30", title: "東茶屋街（散步逛街）", category: "sight", place: "金澤", note: "拍照路線順走。", map: "https://www.google.com/maps/search/?api=1&query=東茶屋街%20金澤" },
+          { id: "d4-4", time: "15:30", title: "兼六園 & 金澤城", category: "sight", place: "金澤", note: "黃昏時段光線漂亮。", map: "https://www.google.com/maps/search/?api=1&query=兼六園" },
+          { id: "d4-5", time: "17:30", title: "Kajimart 超市採購 → 回飯店放東西", category: "move", place: "金澤", note: "補零食/飲料/隔天路上食物。", map: "https://www.google.com/maps/search/?api=1&query=Kajimart%20金澤" },
+          { id: "d4-6", time: "19:30", title: "神社參拜 & 片町周邊晃", category: "sight", place: "金澤", note: "放鬆收尾。", map: "https://www.google.com/maps/search/?api=1&query=金澤%20神社" },
+        ],
+        "2026-01-05": [
+          { id: "d5-1", time: "08:00", title: "清晨整理行李、準備出門", category: "stay", place: "金澤", note: "退房、檢查充電器/護照。", map: "" },
+          { id: "d5-2", time: "09:30", title: "金澤 → 小松機場（巴士）", category: "move", place: "金澤站 → 小松機場", note: "預留候車與排隊時間。", map: "https://www.google.com/maps/search/?api=1&query=Komatsu%20Airport" },
+          { id: "d5-3", time: "11:45–14:35", title: "✈️ 長榮 BR157 小松 → 桃園二航", category: "move", place: "KMQ → TPE", note: "平安回家～", map: "https://www.google.com/maps/search/?api=1&query=桃園國際機場第二航廈" },
+        ],
+      };
 
-    <div class="tab-bar">
-        <a href="#" class="tab-item">📅 行程</a>
-        <a href="#info" class="tab-item">📋 資訊</a>
-        <a href="#budget" class="tab-item">💰 記帳</a>
-        <a href="#emergency" class="tab-item">🆘 緊急</a>
-    </div>
+      const INITIAL_BOOKINGS = {
+        flight: {
+          airline: "EVA Air 長榮航空",
+          flightNoGo: "BR158",
+          flightNoBack: "BR157",
+          from: "TPE 桃園 T2",
+          to: "KMQ 小松",
+          departGo: "2026-01-01 06:35",
+          arriveGo: "2026-01-01 10:25",
+          departBack: "2026-01-05 11:45",
+          arriveBack: "2026-01-05 14:35",
+          seat: "—",
+          pnr: "—",
+        },
+        hotel: {
+          name: "（請填）金澤住宿",
+          img:
+            "https://images.unsplash.com/photo-1501117716987-c8e1ecb21000?auto=format&fit=crop&w=1200&q=70",
+          checkin: "15:00",
+          checkout: "11:00",
+          address: "（請填）",
+          map: "https://www.google.com/maps/search/?api=1&query=Kanazawa%20hotel",
+          note: "可在之後接 Firebase 讀取真實訂單資料。",
+        },
+      };
 
-</body>
+      // ---------- UI Primitives ----------
+      function TopBar({ title, subtitle }) {
+        return (
+          <div className="safe-t sticky top-0 z-30 bg-sand-50/85 backdrop-blur-md">
+            <div className="mx-auto max-w-md px-4 pt-2 pb-3">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <div className="text-[13px] text-sand-600">{subtitle}</div>
+                  <div className="text-xl font-semibold tracking-tight">{title}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="rounded-full bg-white shadow-soft px-3 py-1 text-[12px] text-sand-700 ring-1 ring-sand-100">
+                    PWA Prototype
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="h-px bg-sand-100" />
+          </div>
+        );
+      }
+
+      function Card({ children, className }) {
+        return (
+          <div className={cx("rounded-xl2 bg-white shadow-soft ring-1 ring-sand-100", className)}>
+            {children}
+          </div>
+        );
+      }
+
+      function Modal({ open, onClose, title, children }) {
+        const ref = useRef(null);
+        useEffect(() => {
+          if (!open) return;
+          const onKey = (e) => e.key === "Escape" && onClose();
+          window.addEventListener("keydown", onKey);
+          return () => window.removeEventListener("keydown", onKey);
+        }, [open, onClose]);
+
+        useEffect(() => {
+          if (open) setTimeout(() => ref.current?.focus(), 0);
+        }, [open]);
+
+        if (!open) return null;
+
+        return (
+          <div className="fixed inset-0 z-50">
+            <div className="absolute inset-0 bg-black/35" onClick={onClose} />
+            <div className="absolute inset-x-0 bottom-0 mx-auto max-w-md px-3 pb-3 safe-b">
+              <div
+                className="grain relative rounded-2xl bg-sand-50 shadow-soft2 ring-1 ring-sand-200 outline-none"
+                tabIndex={-1}
+                ref={ref}
+              >
+                <div className="flex items-center justify-between px-4 pt-4">
+                  <div className="text-base font-semibold">{title}</div>
+                  <button
+                    onClick={onClose}
+                    className="rounded-full bg-white/80 px-3 py-1 text-sm ring-1 ring-sand-200 hover:bg-white"
+                  >
+                    關閉
+                  </button>
+                </div>
+                <div className="px-4 pb-4 pt-3">{children}</div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function TabBar({ tab, setTab }) {
+        const items = [
+          { key: "schedule", label: "行程", icon: "🗓️" },
+          { key: "bookings", label: "預訂", icon: "🎫" },
+          { key: "expense", label: "記帳", icon: "🧾" },
+        ];
+        return (
+          <div className="safe-b fixed inset-x-0 bottom-0 z-40 bg-sand-50/90 backdrop-blur-md">
+            <div className="mx-auto max-w-md px-4 pb-2 pt-2">
+              <div className="grid grid-cols-3 gap-2 rounded-2xl bg-white shadow-soft ring-1 ring-sand-100 p-2">
+                {items.map((it) => {
+                  const active = tab === it.key;
+                  return (
+                    <button
+                      key={it.key}
+                      onClick={() => setTab(it.key)}
+                      className={cx(
+                        "rounded-2xl px-3 py-2 text-sm font-medium transition",
+                        active
+                          ? "bg-moss-600 text-white shadow-soft"
+                          : "bg-sand-50 text-sand-800 hover:bg-sand-100"
+                      )}
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <span className={cx("text-base", active ? "" : "opacity-90")}>{it.icon}</span>
+                        <span>{it.label}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // ---------- Schedule Tab ----------
+      function WeatherCard({ dayKey }) {
+        const w = WEATHER[dayKey] ?? { icon: "🌤️", label: "晴", hi: 8, lo: 3, rain: 10 };
+        return (
+          <Card className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm text-sand-600">天氣（假想）</div>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <div className="text-2xl">{w.icon}</div>
+                  <div className="text-lg font-semibold">{w.label}</div>
+                </div>
+                <div className="mt-1 text-sm text-sand-700">
+                  {w.lo}°C – {w.hi}°C<span className="mx-2 text-sand-300">•</span>降雨 {w.rain}%
+                </div>
+              </div>
+
+              <div className="text-right">
+                <div className="text-xs text-sand-500">建議</div>
+                <div className="mt-1 text-sm font-medium text-sand-800">
+                  {w.rain >= 50 ? "帶傘 / 防水鞋" : w.hi <= 6 ? "保暖分層" : "輕便好走"}
+                </div>
+                <div className="mt-1 text-xs text-sand-500">（之後可接真實天氣 API）</div>
+              </div>
+            </div>
+          </Card>
+        );
+      }
+
+      function DateStrip({ selected, onSelect }) {
+        return (
+          <div className="no-scrollbar -mx-4 overflow-x-auto px-4">
+            <div className="flex gap-2 py-2">
+              {TRIP_DAYS.map((d) => {
+                const active = d.key === selected;
+                return (
+                  <button
+                    key={d.key}
+                    onClick={() => onSelect(d.key)}
+                    className={cx(
+                      "shrink-0 rounded-2xl px-4 py-2 text-sm font-medium ring-1 transition",
+                      active
+                        ? "bg-moss-600 text-white ring-moss-600 shadow-soft"
+                        : "bg-white text-sand-800 ring-sand-100 hover:bg-sand-50"
+                    )}
+                  >
+                    {d.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+
+      function TimelineItem({ item, onClick }) {
+        const meta = CATEGORY[item.category] ?? CATEGORY.sight;
+        return (
+          <button
+            onClick={onClick}
+            className="w-full text-left rounded-2xl bg-white ring-1 ring-sand-100 shadow-soft px-4 py-3 hover:bg-sand-50 transition"
+          >
+            <div className="flex items-start gap-3">
+              <div className="mt-1 flex flex-col items-center">
+                <div className={cx("h-3 w-3 rounded-full", meta.dot)} />
+                <div className="mt-2 h-10 w-px bg-sand-100" />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-sm font-semibold text-sand-900">{item.time}</div>
+                  <span className={cx("shrink-0 rounded-full px-2 py-1 text-[12px] font-semibold", meta.pill)}>
+                    {meta.label}
+                  </span>
+                </div>
+                <div className="mt-1 text-[15px] font-semibold leading-snug">{item.title}</div>
+                <div className="mt-1 text-sm text-sand-600 truncate">{item.place}</div>
+              </div>
+
+              <div className="mt-1 shrink-0 text-sand-400">›</div>
+            </div>
+          </button>
+        );
+      }
+
+      function ScheduleTab() {
+        const [dayKey, setDayKey] = useState(TRIP_DAYS[0].key);
+        const [selectedItem, setSelectedItem] = useState(null);
+
+        const items = SCHEDULE[dayKey] ?? [];
+
+        return (
+          <div className="mx-auto max-w-md px-4 pb-28 pt-4">
+            <DateStrip selected={dayKey} onSelect={setDayKey} />
+            <div className="mt-2">
+              <WeatherCard dayKey={dayKey} />
+            </div>
+
+            <div className="mt-4 flex items-center justify-between">
+              <div>
+                <div className="text-sm text-sand-600">每日時間軸</div>
+                <div className="text-base font-semibold">{TRIP_DAYS.find((d) => d.key === dayKey)?.label}</div>
+              </div>
+              <div className="text-xs text-sand-500">{items.length} 個項目</div>
+            </div>
+
+            <div className="mt-3 space-y-3">
+              {items.map((it) => (
+                <TimelineItem key={it.id} item={it} onClick={() => setSelectedItem(it)} />
+              ))}
+            </div>
+
+            <Modal
+              open={!!selectedItem}
+              onClose={() => setSelectedItem(null)}
+              title="行程詳情"
+            >
+              {selectedItem && (
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-sm text-sand-600">{selectedItem.time}</div>
+                      <div className="mt-1 text-lg font-semibold leading-snug">{selectedItem.title}</div>
+                      <div className="mt-1 text-sm text-sand-700">{selectedItem.place}</div>
+                    </div>
+                    <span
+                      className={cx(
+                        "shrink-0 rounded-full px-3 py-1 text-[12px] font-semibold",
+                        (CATEGORY[selectedItem.category] ?? CATEGORY.sight).pill
+                      )}
+                    >
+                      {(CATEGORY[selectedItem.category] ?? CATEGORY.sight).label}
+                    </span>
+                  </div>
+
+                  <Card className="p-3">
+                    <div className="text-xs text-sand-500">備註</div>
+                    <div className="mt-1 text-sm text-sand-800 leading-relaxed">
+                      {selectedItem.note || "（尚未填寫）"}
+                    </div>
+                  </Card>
+
+                  <div className="flex gap-2">
+                    <a
+                      href={selectedItem.map || "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={cx(
+                        "flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold shadow-soft ring-1 transition",
+                        selectedItem.map
+                          ? "bg-moss-600 text-white ring-moss-600 hover:bg-moss-700"
+                          : "bg-sand-100 text-sand-400 ring-sand-200 pointer-events-none"
+                      )}
+                    >
+                      打開地圖
+                    </a>
+                    <button
+                      onClick={() => navigator.clipboard?.writeText(`${selectedItem.time} ${selectedItem.title} @ ${selectedItem.place}`)}
+                      className="flex-1 rounded-2xl bg-white px-4 py-3 text-sm font-semibold shadow-soft ring-1 ring-sand-100 hover:bg-sand-50"
+                    >
+                      複製摘要
+                    </button>
+                  </div>
+                </div>
+              )}
+            </Modal>
+          </div>
+        );
+      }
+
+      // ---------- Bookings Tab ----------
+      function BoardingPass({ flight, direction }) {
+        const isGo = direction === "go";
+        const from = isGo ? flight.from : flight.to;
+        const to = isGo ? flight.to : flight.from;
+        const no = isGo ? flight.flightNoGo : flight.flightNoBack;
+        const depart = isGo ? flight.departGo : flight.departBack;
+        const arrive = isGo ? flight.arriveGo : flight.arriveBack;
+
+        return (
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-moss-700 to-moss-600 text-white shadow-soft">
+            <div className="grain absolute inset-0 opacity-80" />
+            <div className="relative p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="text-xs text-white/80">{flight.airline}</div>
+                  <div className="mt-1 text-lg font-semibold tracking-tight">Boarding Pass</div>
+                </div>
+                <div className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold ring-1 ring-white/25">
+                  {isGo ? "去程" : "回程"} · {no}
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-3 items-center gap-3">
+                <div>
+                  <div className="text-xs text-white/70">From</div>
+                  <div className="mt-1 text-base font-semibold">{from.split(" ")[0]}</div>
+                  <div className="text-xs text-white/70">{from.replace(from.split(" ")[0], "").trim()}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl">✈️</div>
+                  <div className="mt-1 text-xs text-white/70">Non-stop</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-white/70">To</div>
+                  <div className="mt-1 text-base font-semibold">{to.split(" ")[0]}</div>
+                  <div className="text-xs text-white/70">{to.replace(to.split(" ")[0], "").trim()}</div>
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="rounded-2xl bg-white/12 p-3 ring-1 ring-white/20">
+                  <div className="text-xs text-white/70">Depart</div>
+                  <div className="mt-1 text-sm font-semibold">{depart}</div>
+                </div>
+                <div className="rounded-2xl bg-white/12 p-3 ring-1 ring-white/20">
+                  <div className="text-xs text-white/70">Arrive</div>
+                  <div className="mt-1 text-sm font-semibold">{arrive}</div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between text-xs text-white/75">
+                <div>Seat: {flight.seat}</div>
+                <div>PNR: {flight.pnr}</div>
+              </div>
+            </div>
+
+            <div className="relative flex items-center justify-between border-t border-white/20 px-4 py-3">
+              <div className="text-xs text-white/80">Mobile</div>
+              <div className="h-6 w-24 rounded-md bg-white/20 ring-1 ring-white/25" />
+            </div>
+          </div>
+        );
+      }
+
+      function HotelCard({ hotel }) {
+        return (
+          <Card className="overflow-hidden">
+            <div className="relative h-36">
+              <img src={hotel.img} alt="hotel" className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
+              <div className="absolute left-4 bottom-3">
+                <div className="text-xs text-white/80">住宿</div>
+                <div className="text-lg font-semibold text-white">{hotel.name}</div>
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-2xl bg-sand-50 p-3 ring-1 ring-sand-100">
+                  <div className="text-xs text-sand-500">Check-in</div>
+                  <div className="mt-1 text-sm font-semibold">{hotel.checkin}</div>
+                </div>
+                <div className="rounded-2xl bg-sand-50 p-3 ring-1 ring-sand-100">
+                  <div className="text-xs text-sand-500">Check-out</div>
+                  <div className="mt-1 text-sm font-semibold">{hotel.checkout}</div>
+                </div>
+              </div>
+
+              <div className="mt-3 rounded-2xl bg-white p-3 ring-1 ring-sand-100">
+                <div className="text-xs text-sand-500">地址</div>
+                <div className="mt-1 text-sm text-sand-800">{hotel.address}</div>
+              </div>
+
+              <div className="mt-3 flex gap-2">
+                <a
+                  href={hotel.map}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 rounded-2xl bg-moss-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-soft hover:bg-moss-700"
+                >
+                  打開地圖
+                </a>
+                <button
+                  onClick={() => navigator.clipboard?.writeText(`${hotel.name} ${hotel.address}`)}
+                  className="flex-1 rounded-2xl bg-white px-4 py-3 text-sm font-semibold shadow-soft ring-1 ring-sand-100 hover:bg-sand-50"
+                >
+                  複製地址
+                </button>
+              </div>
+
+              <div className="mt-3 text-xs text-sand-500">{hotel.note}</div>
+            </div>
+          </Card>
+        );
+      }
+
+      function BookingsTab() {
+        const [bookings] = useState(INITIAL_BOOKINGS);
+
+        return (
+          <div className="mx-auto max-w-md px-4 pb-28 pt-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm text-sand-600">機票</div>
+                <div className="text-base font-semibold">登機證卡片</div>
+              </div>
+              <div className="text-xs text-sand-500">Prototype</div>
+            </div>
+
+            <BoardingPass flight={bookings.flight} direction="go" />
+            <BoardingPass flight={bookings.flight} direction="back" />
+
+            <div className="pt-2">
+              <div className="text-sm text-sand-600">住宿</div>
+              <div className="text-base font-semibold">飯店資訊</div>
+            </div>
+
+            <HotelCard hotel={bookings.hotel} />
+          </div>
+        );
+      }
+
+      // ---------- Expense Tab ----------
+      const PEOPLE = ["我", "朋友A", "朋友B"];
+
+      const DEFAULT_RATE = 0.22; // 1 JPY ≈ 0.22 TWD (估算用；之後可接匯率 API)
+
+      function ExpenseTab() {
+        const [rate, setRate] = useState(DEFAULT_RATE);
+
+        const [entries, setEntries] = useState([
+          {
+            id: "e1",
+            dateKey: "2026-01-01",
+            time: "12:10",
+            title: "利木津巴士車票",
+            currency: "JPY",
+            amount: 3400,
+            category: "move",
+            payer: "我",
+            split: ["我", "朋友A", "朋友B"],
+          },
+          {
+            id: "e2",
+            dateKey: "2026-01-01",
+            time: "19:10",
+            title: "關東煮晚餐",
+            currency: "JPY",
+            amount: 5400,
+            category: "food",
+            payer: "朋友A",
+            split: ["我", "朋友A", "朋友B"],
+          },
+        ]);
+
+        const [form, setForm] = useState({
+          dateKey: TRIP_DAYS[0].key,
+          time: "12:00",
+          title: "",
+          currency: "JPY",
+          amount: "",
+          category: "food",
+          payer: "我",
+          split: ["我", "朋友A", "朋友B"],
+        });
+
+        const totals = useMemo(() => {
+          let totalJPY = 0;
+          let totalTWD = 0;
+          for (const e of entries) {
+            if (e.currency === "JPY") {
+              totalJPY += e.amount;
+              totalTWD += e.amount * rate;
+            } else {
+              totalTWD += e.amount;
+              totalJPY += e.amount / rate;
+            }
+          }
+          return { totalJPY, totalTWD };
+        }, [entries, rate]);
+
+        const grouped = useMemo(() => {
+          const m = new Map();
+          for (const e of entries) {
+            const k = e.dateKey;
+            if (!m.has(k)) m.set(k, []);
+            m.get(k).push(e);
+          }
+          for (const [k, arr] of m.entries()) {
+            arr.sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+            m.set(k, arr);
+          }
+          return m;
+        }, [entries]);
+
+        const estimate = useMemo(() => {
+          const amt = Number(form.amount || 0);
+          if (!amt) return { twd: 0, jpy: 0 };
+          if (form.currency === "JPY") return { twd: amt * rate, jpy: amt };
+          return { twd: amt, jpy: amt / rate };
+        }, [form.amount, form.currency, rate]);
+
+        const toggleSplit = (name) => {
+          setForm((f) => {
+            const has = f.split.includes(name);
+            const next = has ? f.split.filter((x) => x !== name) : [...f.split, name];
+            return { ...f, split: next.length ? next : [name] }; // keep at least one
+          });
+        };
+
+        const addEntry = () => {
+          const amountNum = Number(form.amount);
+          if (!amountNum || amountNum <= 0) {
+            alert("請輸入金額（> 0）");
+            return;
+          }
+          if (!form.title.trim()) {
+            alert("請輸入項目名稱");
+            return;
+          }
+          const id = "e" + Math.random().toString(16).slice(2);
+          setEntries((prev) => [
+            ...prev,
+            {
+              id,
+              dateKey: form.dateKey,
+              time: form.time,
+              title: form.title.trim(),
+              currency: form.currency,
+              amount: amountNum,
+              category: form.category,
+              payer: form.payer,
+              split: form.split,
+            },
+          ]);
+          setForm((f) => ({ ...f, title: "", amount: "" }));
+        };
+
+        const removeEntry = (id) => {
+          setEntries((prev) => prev.filter((e) => e.id !== id));
+        };
+
+        return (
+          <div className="mx-auto max-w-md px-4 pb-28 pt-4 space-y-4">
+            {/* Totals */}
+            <Card className="p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-sm text-sand-600">總支出儀表板</div>
+                  <div className="mt-1 text-lg font-semibold">旅費總覽</div>
+                </div>
+                <div className="rounded-2xl bg-sand-50 px-3 py-2 ring-1 ring-sand-100">
+                  <div className="text-[11px] text-sand-500">估算匯率</div>
+                  <div className="mt-0.5 text-sm font-semibold">
+                    1 JPY ≈{" "}
+                    <input
+                      value={rate}
+                      onChange={(e) => setRate(Number(e.target.value) || DEFAULT_RATE)}
+                      inputMode="decimal"
+                      className="w-16 rounded-lg bg-white px-2 py-1 text-center ring-1 ring-sand-100"
+                    />{" "}
+                    TWD
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="rounded-2xl bg-moss-600 p-4 text-white shadow-soft">
+                  <div className="text-xs text-white/80">台幣（估算）</div>
+                  <div className="mt-1 text-2xl font-semibold tracking-tight">NT$ {fmtMoney(totals.totalTWD)}</div>
+                </div>
+                <div className="rounded-2xl bg-clay-600 p-4 text-white shadow-soft">
+                  <div className="text-xs text-white/80">日幣（估算）</div>
+                  <div className="mt-1 text-2xl font-semibold tracking-tight">¥ {fmtMoney(totals.totalJPY)}</div>
+                </div>
+              </div>
+              <div className="mt-3 text-xs text-sand-500">
+                註：目前為原型；之後可把匯率改為自動抓取（ex: Open Exchange Rates / 銀行牌告）。
+              </div>
+            </Card>
+
+            {/* Add Expense */}
+            <Card className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-sand-600">新增記帳</div>
+                  <div className="text-base font-semibold">快速輸入</div>
+                </div>
+                <div className="text-xs text-sand-500">Mobile-first</div>
+              </div>
+
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-sand-500">日期</label>
+                  <select
+                    value={form.dateKey}
+                    onChange={(e) => setForm((f) => ({ ...f, dateKey: e.target.value }))}
+                    className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                  >
+                    {TRIP_DAYS.map((d) => (
+                      <option key={d.key} value={d.key}>{d.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs text-sand-500">時間</label>
+                  <input
+                    type="time"
+                    value={form.time}
+                    onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))}
+                    className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                  />
+                </div>
+
+                <div className="col-span-2">
+                  <label className="text-xs text-sand-500">項目</label>
+                  <input
+                    value={form.title}
+                    onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                    placeholder="例如：午餐、車票、咖啡、門票…"
+                    className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs text-sand-500">幣別</label>
+                  <select
+                    value={form.currency}
+                    onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value }))}
+                    className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                  >
+                    <option value="JPY">JPY 日幣</option>
+                    <option value="TWD">TWD 台幣</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs text-sand-500">金額</label>
+                  <input
+                    value={form.amount}
+                    onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value.replace(/[^\d.]/g, "") }))}
+                    inputMode="numeric"
+                    placeholder="只能輸入數字"
+                    className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs text-sand-500">類別</label>
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                    className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                  >
+                    <option value="food">美食</option>
+                    <option value="sight">景點</option>
+                    <option value="move">交通</option>
+                    <option value="stay">住宿</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs text-sand-500">付款人</label>
+                  <select
+                    value={form.payer}
+                    onChange={(e) => setForm((f) => ({ ...f, payer: e.target.value }))}
+                    className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                  >
+                    {PEOPLE.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="col-span-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-sand-500">分攤對象</label>
+                    <div className="text-xs text-sand-500">
+                      估算：NT$ {fmtMoney(estimate.twd)} / ¥ {fmtMoney(estimate.jpy)}
+                    </div>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {PEOPLE.map((p) => {
+                      const active = form.split.includes(p);
+                      return (
+                        <button
+                          key={p}
+                          onClick={() => toggleSplit(p)}
+                          className={cx(
+                            "rounded-full px-3 py-2 text-sm font-medium ring-1 transition",
+                            active ? "bg-moss-600 text-white ring-moss-600" : "bg-white text-sand-800 ring-sand-100 hover:bg-sand-50"
+                          )}
+                        >
+                          {active ? "✓ " : ""}{p}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="col-span-2">
+                  <button
+                    onClick={addEntry}
+                    className="w-full rounded-2xl bg-moss-600 px-4 py-3 text-sm font-semibold text-white shadow-soft hover:bg-moss-700"
+                  >
+                    新增到列表
+                  </button>
+                </div>
+              </div>
+            </Card>
+
+            {/* List */}
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm text-sand-600">每日支出明細</div>
+                <div className="text-base font-semibold">列表</div>
+              </div>
+              <div className="text-xs text-sand-500">{entries.length} 筆</div>
+            </div>
+
+            {[...grouped.keys()].sort().map((dayKey) => {
+              const day = TRIP_DAYS.find((d) => d.key === dayKey)?.label ?? dayKey;
+              const arr = grouped.get(dayKey);
+              const dayTotalTWD = arr.reduce((sum, e) => sum + (e.currency === "TWD" ? e.amount : e.amount * rate), 0);
+              return (
+                <Card key={dayKey} className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-semibold">{day}</div>
+                    <div className="text-xs text-sand-600">小計 NT$ {fmtMoney(dayTotalTWD)}</div>
+                  </div>
+
+                  <div className="mt-3 space-y-2">
+                    {arr.map((e) => {
+                      const meta = CATEGORY[e.category] ?? CATEGORY.sight;
+                      const twd = e.currency === "TWD" ? e.amount : e.amount * rate;
+                      return (
+                        <div key={e.id} className="rounded-2xl bg-sand-50 ring-1 ring-sand-100 px-3 py-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className={cx("rounded-full px-2 py-1 text-[11px] font-semibold", meta.pill)}>
+                                  {meta.label}
+                                </span>
+                                <span className="text-xs text-sand-500">{e.time}</span>
+                              </div>
+                              <div className="mt-1 text-sm font-semibold truncate">{e.title}</div>
+                              <div className="mt-1 text-xs text-sand-600">
+                                付款人：<span className="font-medium">{e.payer}</span> · 分攤：{e.split.join("、")}
+                              </div>
+                            </div>
+
+                            <div className="shrink-0 text-right">
+                              <div className="text-sm font-semibold">
+                                {e.currency === "JPY" ? `¥ ${fmtMoney(e.amount)}` : `NT$ ${fmtMoney(e.amount)}`}
+                              </div>
+                              <div className="text-xs text-sand-500">≈ NT$ {fmtMoney(twd)}</div>
+                              <button
+                                onClick={() => removeEntry(e.id)}
+                                className="mt-2 rounded-full bg-white px-3 py-1 text-xs font-semibold ring-1 ring-sand-100 hover:bg-sand-100"
+                              >
+                                刪除
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        );
+      }
+
+      // ---------- App Shell ----------
+      function App() {
+        const [tab, setTab] = useState("schedule");
+
+        const header = useMemo(() => {
+          if (tab === "schedule") return { title: "行程", subtitle: "金澤・富山・高山" };
+          if (tab === "bookings") return { title: "預訂", subtitle: "機票・住宿" };
+          return { title: "記帳", subtitle: "團體分攤" };
+        }, [tab]);
+
+        return (
+          <div className="min-h-screen">
+            <TopBar title={header.title} subtitle={header.subtitle} />
+
+            {tab === "schedule" && <ScheduleTab />}
+            {tab === "bookings" && <BookingsTab />}
+            {tab === "expense" && <ExpenseTab />}
+
+            <TabBar tab={tab} setTab={setTab} />
+          </div>
+        );
+      }
+
+      // Render
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+      // Optional: Service Worker registration placeholder (for later PWA upgrade)
+      // Note: In this single-file prototype (CDN), a real offline SW/manifest needs separate files or a build step.
+      // if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
+    </script>
+  </body>
 </html>
