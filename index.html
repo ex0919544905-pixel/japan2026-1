@@ -8,126 +8,168 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root { --jp-beige: #F7F3F0; --jp-red: #BC6464; --jp-dark: #2D2D2D; }
-        body { font-family: 'Noto Sans JP', sans-serif; background-color: var(--jp-beige); color: var(--jp-dark); }
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: var(--jp-beige); color: var(--jp-dark); padding-bottom: 100px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
-        .day-badge { background: var(--jp-red); color: white; padding: 2px 12px; border-radius: 99px; font-size: 12px; }
-        .timeline-item::before { content: ""; position: absolute; left: 7px; top: 24px; bottom: -20px; width: 1px; background: #DDD; }
-        .timeline-item:last-child::before { display: none; }
+        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-top: 1px solid #EEE; }
+        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 15px; }
         .nav-item.active { color: var(--jp-red); font-weight: bold; }
-        .sticky-header { position: sticky; top: 0; z-index: 40; background: var(--jp-beige); }
+        input, select { background: #F0F0F0; border-radius: 8px; padding: 8px; font-size: 14px; width: 100%; margin-top: 4px; }
+        .btn-save { background: var(--jp-dark); color: white; padding: 12px; border-radius: 12px; width: 100%; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
-<body class="pb-24">
+<body>
 
-    <header class="p-6 pt-12 sticky-header">
-        <div class="flex justify-between items-end">
-            <div>
-                <h1 class="text-2xl font-bold tracking-tighter">1月1日 - 1月5日</h1>
-                <p class="text-sm opacity-50">KANAZAWA & TAKAYAMA</p>
-            </div>
-            <div class="text-right">
-                <span class="text-xs font-bold border-b border-black">沈 · 瑄 · YO</span>
-            </div>
-        </div>
+    <header class="p-6 pt-12 sticky top-0 bg-[#F7F3F0] z-40">
+        <h1 class="text-2xl font-bold tracking-tighter">金澤高山 5D4N</h1>
+        <p class="text-xs opacity-50">JAN 01 - JAN 05, 2026</p>
     </header>
 
     <main class="px-5">
-        
-        <section id="tab-itinerary" class="tab-content active space-y-8">
-            <div>
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="day-badge">Day 1</span>
-                    <h2 class="text-lg font-bold">1月1日 (四) 金澤・高山</h2>
+        <section id="tab-itinerary" class="tab-content active">
+            <div class="mb-8">
+                <h2 class="text-sm font-bold text-red-700 mb-3">1月1日 (四) 出發與高山老街</h2>
+                <div class="card">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">Flight & Bus</p>
+                    <p class="text-sm font-bold mt-1">BR156 (06:35-10:25) </p>
+                    <p class="text-xs text-gray-500">13:00 小松機場利木津巴士 → 金澤站西口 </p>
                 </div>
-                
-                <div class="space-y-6">
-                    <div class="relative pl-8 timeline-item">
-                        <div class="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-red-800 bg-white"></div>
-                        <div class="bg-white p-4 rounded-2xl shadow-sm">
-                            <span class="text-[10px] font-bold text-blue-500 uppercase">Flight</span>
-                            <h3 class="font-bold text-sm mt-1">長榮航空 BR156 </h3>
-                            <p class="text-xs text-gray-500">06:35 桃園 → 10:25 小松 </p>
-                        </div>
-                    </div>
-
-                    <div class="relative pl-8 timeline-item">
-                        <div class="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-gray-400 bg-white"></div>
-                        <div class="bg-white p-4 rounded-2xl shadow-sm">
-                            <span class="text-[10px] font-bold text-orange-500 uppercase">Spot</span>
-                            <h3 class="font-bold text-sm mt-1">高山老街散策 </h3>
-                            <p class="text-xs text-gray-500 mt-1">必看：星巴克限定木漆杯、Miffy店 </p>
-                            <div class="flex gap-2 mt-3">
-                                <a href="https://www.google.com/maps/search/?api=1&query=高山老街" class="text-[11px] bg-gray-100 px-3 py-1 rounded-full">🧭 開啟導航</a>
-                            </div>
-                        </div>
-                    </div>
+                <div class="card">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">Spot & Food</p>
+                    <p class="text-sm font-bold mt-1">高山散策重點 </p>
+                    <ul class="text-xs text-gray-600 space-y-2 mt-2">
+                        <li>📍 <b>星巴克高山岡本店</b> (限定木漆杯) </li>
+                        <li>🍮 <b>高山布丁亭</b> (10:00-15:30) </li>
+                        <li>🐰 <b>Miffy おやつ堂</b> (09:30-17:00) </li>
+                        <li>🍶 <b>船坂酒造店</b> (清酒試飲) </li>
+                    </ul>
+                    <a href="https://www.google.com/maps/search/?api=1&query=高山古い町並" class="inline-block mt-3 text-xs bg-stone-100 px-3 py-1 rounded-full">🧭 導航至老街</a>
                 </div>
             </div>
 
-            <div>
-                <div class="flex items-center gap-3 mb-6 mt-10">
-                    <span class="day-badge">Day 2</span>
-                    <h2 class="text-lg font-bold">1月2日 (五) 金澤文化</h2>
-                </div>
-                <div class="bg-white p-5 rounded-3xl shadow-sm border border-orange-100">
-                    <p class="text-xs text-orange-600 font-bold mb-2">💡 導遊攻略</p>
-                    <p class="text-sm leading-relaxed">
-                        今天重點是 **21世紀美術館** 。<br>
-                        記得去 **Le Musée de H** 買辻口博啟的伴手禮 。<br>
-                        晚餐可以去 **片町** 找金澤關東煮 。
-                    </p>
+            <div class="mb-8">
+                <h2 class="text-sm font-bold text-red-700 mb-3">1月2日 (五) 金澤文化</h2>
+                <div class="card">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">Art & Culture</p>
+                    <p class="text-sm font-bold mt-1">21世紀美術館 / 兼六園 </p>
+                    <p class="text-xs text-gray-500 mt-1">10:00 金運 MZA 新年首賣 </p>
+                    <p class="text-xs text-gray-500 mt-1">伴手禮：Le Musée de H (最後點餐15:00) </p>
                 </div>
             </div>
         </section>
 
-        <section id="tab-budget" class="tab-content space-y-6">
-            <h2 class="text-xl font-bold mb-4">支出同步表</h2>
-            <div class="bg-white rounded-3xl p-6 shadow-sm">
-                <div class="grid grid-cols-3 gap-4 text-center border-b pb-4 mb-4">
-                    <div><p class="text-[10px] opacity-50">沈</p><p class="font-bold">¥6,480</p></div>
-                    <div><p class="text-[10px] opacity-50">瑄</p><p class="font-bold">¥6,480</p></div>
-                    <div><p class="text-[10px] opacity-50">YO</p><p class="font-bold">¥6,480</p></div>
+        <section id="tab-budget" class="tab-content">
+            <h2 class="text-xl font-bold mb-4">旅行記帳本</h2>
+            
+            <div class="card">
+                <h3 class="text-sm font-bold mb-3 border-b pb-2">新增支出</h3>
+                <div class="space-y-3">
+                    <div><label class="text-xs opacity-50">日期</label>
+                        <select id="exp-date">
+                            <option>1/1</option><option>1/2</option><option>1/3</option><option>1/4</option><option>1/5</option>
+                        </select>
+                    </div>
+                    <div><label class="text-xs opacity-50">項目 (例如: GU, 無印良品)</label>
+                        <input type="text" id="exp-name" placeholder="請輸入店名或內容">
+                    </div>
+                    <div><label class="text-xs opacity-50">總金額 (JPY)</label>
+                        <input type="number" id="exp-amount" placeholder="0">
+                    </div>
+                    <div><label class="text-xs opacity-50">誰付錢？</label>
+                        <select id="exp-payer">
+                            <option value="沈">沈</option><option value="瑄">瑄</option><option value="YO">YO</option>
+                        </select>
+                    </div>
+                    <div><label class="text-xs opacity-50">分帳方式</label>
+                        <select id="exp-split" onchange="toggleSplitDetail()">
+                            <option value="equally">三個人平分</option>
+                            <option value="custom">自定義金額</option>
+                        </select>
+                    </div>
+                    <div id="split-detail" class="hidden bg-stone-50 p-3 rounded-lg space-y-2">
+                        <div class="flex items-center justify-between text-xs"><span>YO 負擔:</span><input type="number" id="split-yo" class="w-20" placeholder="0"></div>
+                        <div class="flex items-center justify-between text-xs"><span>瑄 負擔:</span><input type="number" id="split-xuan" class="w-20" placeholder="0"></div>
+                    </div>
                 </div>
-                <ul class="space-y-3 text-sm">
-                    <li class="flex justify-between"><span>新幹線 (單程) </span><span>¥2,860</span></li>
-                    <li class="flex justify-between"><span>特急飛 Hida </span><span>¥3,620</span></li>
-                </ul>
+                <button class="btn-save" onclick="saveExpense()">儲存這筆紀錄</button>
             </div>
+
+            <div id="expense-list" class="space-y-3">
+                </div>
         </section>
 
-        <section id="tab-info" class="tab-content space-y-6">
-            <div class="bg-white rounded-3xl p-6 shadow-sm">
-                <h3 class="font-bold mb-4">🏨 住宿資訊 </h3>
-                <p class="text-sm">SOKI KANAZAWA </p>
-                <p class="text-xs text-gray-500 mt-1">石川県金沢市袋町 2-1 </p>
-                <a href="tel:0762100277" class="inline-block mt-4 text-xs font-bold text-red-700 underline">撥打飯店電話</a>
+        <section id="tab-info" class="tab-content">
+            <div class="card">
+                <h3 class="font-bold mb-2">🏨 住宿資訊 </h3>
+                <p class="text-sm">SOKI KANAZAWA</p>
+                <p class="text-xs opacity-60">石川県金沢市袋町 2-1</p>
+                <p class="text-xs mt-2">Check-in: 15:00 / Out: 11:00 </p>
+            </div>
+            <div class="card border-l-4 border-red-500">
+                <h3 class="font-bold mb-2">📞 緊急聯絡</h3>
+                <p class="text-sm">沈、瑄、YO 連絡群組</p>
+                <p class="text-xs mt-1">駐日代表處: +81-3-3280-7917</p>
             </div>
         </section>
     </main>
 
-    <nav class="fixed bottom-6 left-6 right-6 h-16 glass-nav rounded-full shadow-2xl flex items-center justify-around px-6 z-50">
-        <button onclick="showTab('itinerary')" class="nav-item active flex flex-col items-center">
-            <span class="text-[10px]">SCHEDULE</span>
-        </button>
-        <button onclick="showTab('budget')" class="nav-item flex flex-col items-center text-gray-400">
-            <span class="text-[10px]">BUDGET</span>
-        </button>
-        <button onclick="showTab('info')" class="nav-item flex flex-col items-center text-gray-400">
-            <span class="text-[10px]">INFO</span>
-        </button>
+    <nav class="fixed bottom-0 left-0 right-0 h-20 glass-nav flex items-center justify-around px-10 z-50">
+        <button onclick="showTab('itinerary')" class="nav-item active text-xs">行程</button>
+        <button onclick="showTab('budget')" class="nav-item text-xs text-gray-400">記帳</button>
+        <button onclick="showTab('info')" class="nav-item text-xs text-gray-400">資訊</button>
     </nav>
 
     <script>
         function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active', 'text-gray-400'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.add('text-gray-400'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
             document.getElementById('tab-' + tabId).classList.add('active');
             event.currentTarget.classList.add('active');
-            // 補上非 active 的顏色
-            document.querySelectorAll('.nav-item:not(.active)').forEach(nav => nav.classList.add('text-gray-400'));
+            event.currentTarget.classList.remove('text-gray-400');
+            if(tabId === 'budget') renderExpenses();
+        }
+
+        function toggleSplitDetail() {
+            const split = document.getElementById('exp-split').value;
+            document.getElementById('split-detail').classList.toggle('hidden', split !== 'custom');
+        }
+
+        function saveExpense() {
+            const expense = {
+                id: Date.now(),
+                date: document.getElementById('exp-date').value,
+                name: document.getElementById('exp-name').value,
+                amount: document.getElementById('exp-amount').value,
+                payer: document.getElementById('exp-payer').value,
+                split: document.getElementById('exp-split').value,
+                yo: document.getElementById('split-yo').value,
+                xuan: document.getElementById('split-xuan').value
+            };
+            if(!expense.name || !expense.amount) return alert('請輸入完整資訊');
+            
+            let list = JSON.parse(localStorage.getItem('japan_expenses') || '[]');
+            list.unshift(expense);
+            localStorage.setItem('japan_expenses', JSON.stringify(list));
+            alert('紀錄成功！');
+            renderExpenses();
+        }
+
+        function renderExpenses() {
+            const list = JSON.parse(localStorage.getItem('japan_expenses') || '[]');
+            const container = document.getElementById('expense-list');
+            container.innerHTML = '<h3 class="text-sm font-bold mt-6 mb-2">歷史紀錄</h3>';
+            list.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'card text-sm';
+                let splitText = item.split === 'equally' ? '三人平分' : `YO:${item.yo} / 瑄:${item.xuan}`;
+                div.innerHTML = `
+                    <div class="flex justify-between font-bold"><span>${item.name}</span><span class="text-red-600">¥${item.amount}</span></div>
+                    <div class="text-[11px] opacity-60 mt-1">${item.date} · ${item.payer} 付款 · ${splitText}</div>
+                `;
+                container.appendChild(div);
+            });
         }
     </script>
 </body>
