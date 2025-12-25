@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 KANAZAWA Cyber Trip</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff007f;
+            --neon-blue: #00f3ff;
+            --retro-yellow: #f8ef02;
+            --bg-dark: #0d0d0d;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Noto Sans TC', sans-serif;
+            background-image: radial-gradient(circle at 20% 20%, #1a1a1a 0%, transparent 40%),
+                              url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+        }
+        .retro-card {
+            border: 2px solid var(--neon-blue);
+            box-shadow: 5px 5px 0px var(--neon-pink);
+            background: rgba(20, 20, 20, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+        .retro-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+        }
+        .nav-btn {
+            background: var(--retro-yellow);
+            color: black;
+            font-weight: 900;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        }
+        .tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .tag-food { background: var(--neon-pink); color: white; }
+        .tag-transport { background: var(--neon-blue); color: black; }
+        .tag-spot { background: var(--retro-yellow); color: black; }
+        .glitch-text {
+            font-family: 'Space Mono', monospace;
+            text-shadow: 2px 2px var(--neon-pink), -2px -2px var(--neon-blue);
+        }
+        .tab-active {
+            border-bottom: 4px solid var(--neon-pink);
+            color: var(--neon-pink);
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <header class="p-6 text-center border-b-2 border-dashed border-gray-700">
+        <h1 class="text-4xl font-black glitch-text italic uppercase">Kanazawa 2026</h1>
+        <p class="text-xs tracking-widest text-cyan-400 mt-2">沈 x 瑄 x YO • Retro Cyberpunk Tour</p>
+    </header>
+
+    <nav class="sticky top-0 z-50 bg-black bg-opacity-90 border-b border-gray-800 flex justify-around p-4 text-sm font-bold">
+        <a href="#itinerary" class="tab-active">行程日程</a>
+        <a href="#info" class="text-gray-400">交通/住宿</a>
+        <a href="#budget" class="text-gray-400">三人預算</a>
+    </nav>
+
+    <main class="p-4 space-y-8" id="itinerary">
+        
+        <section>
+            <div class="flex justify-between items-end mb-4">
+                <h2 class="text-3xl font-black text-white italic">JAN 01 <span class="text-sm text-gray-500">THU</span></h2>
+                <div class="text-right">
+                    <span class="text-xs block text-cyan-400">高山市 天氣預報</span>
+                    <span class="font-bold text-lg">❄️ -2°C / 4°C</span>
+                </div>
+            </div>
+
+            <div class="retro-card p-4 mb-4">
+                <span class="tag tag-transport">FLIGHT</span>
+                <h3 class="text-xl font-bold mt-2">長榮航空 BR156</h3>
+                <p class="text-sm text-gray-400 mt-1">06:35 台北(TPE) → 10:25 小松(KMQ) </p>
+                <div class="mt-3 flex gap-2">
+                    <a href="https://www.google.com/maps/search/小松空港" class="nav-btn px-4 py-1 text-xs">開啟導航</a>
+                </div>
+            </div>
+
+            <div class="retro-card p-4 mb-4 border-l-8 border-l-yellow-400">
+                <span class="tag tag-transport">TRANSIT</span>
+                <h3 class="text-lg font-bold mt-2">前往高山市 (Takayama)</h3>
+                <p class="text-sm mt-1 opacity-80">搭乘特急 Hida 號直達飛驒高山 </p>
+                <p class="text-xs text-pink-400 font-bold mt-2">攻略：抵達高山後先去「星巴克 高山岡本店」搶購限定漆器木杯 </p>
+            </div>
+
+            <div class="retro-card p-4 mb-4">
+                <span class="tag tag-food">FOOD & SHOP</span>
+                <h3 class="text-lg font-bold mt-2">高山老街散策</h3>
+                <ul class="text-sm mt-2 space-y-2">
+                    <li>📍 <b>必買：</b> みっふいー(Miffy) おやつ堂 飛驒高山店 </li>
+                    <li>🍮 <b>必吃：</b> 高山布丁亭 (10:00-15:30) </li>
+                    <li>🍶 <b>必玩：</b> 船坂酒造店 (清酒試飲) </li>
+                </ul>
+                <a href="https://www.google.com/maps/search/高山老街" class="nav-btn px-4 py-1 text-xs inline-block mt-3">地圖導航</a>
+            </div>
+        </section>
+
+        <section>
+            <div class="flex justify-between items-end mb-4">
+                <h2 class="text-3xl font-black text-white italic">JAN 02 <span class="text-sm text-gray-500">FRI</span></h2>
+                <div class="text-right">
+                    <span class="text-xs block text-cyan-400">金澤市 天氣預報</span>
+                    <span class="font-bold text-lg">☁️ 2°C / 6°C</span>
+                </div>
+            </div>
+            
+            <div class="retro-card p-4 mb-4">
+                <span class="tag tag-spot">SPOT</span>
+                <h3 class="text-lg font-bold mt-2">金澤 21 世紀美術館</h3>
+                <p class="text-sm opacity-80 mt-1">著名的「泳池」景點，需事先預約！ </p>
+                <p class="text-xs text-pink-400 font-bold mt-2 italic">導遊補帖：Le Musée de H 必買辻口博啟大師的伴手禮 </p>
+                <a href="https://www.google.com/maps/search/金澤21世紀美術館" class="nav-btn px-4 py-1 text-xs inline-block mt-3">導航至美術館</a>
+            </div>
+        </section>
+
+        <hr class="border-gray-800 my-10">
+
+        <section id="info" class="space-y-6">
+            <h2 class="text-2xl font-black text-cyan-400 underline decoration-pink-500">重要資訊 INFO</h2>
+            
+            <div class="retro-card p-4">
+                <h3 class="font-bold text-pink-500">🏨 住宿資訊</h3>
+                <p class="text-sm mt-2 font-bold">SOKI KANAZAWA</p>
+                <p class="text-xs opacity-70">石川縣金澤市袋町 2-1 (920-0909) </p>
+                <p class="text-xs mt-1">Check-in: 15:00 | Check-out: 11:00 </p>
+                <a href="https://www.google.com/maps/search/SOKI+KANAZAWA" class="nav-btn px-4 py-1 text-xs inline-block mt-3">導航至飯店</a>
+            </div>
+
+            <div class="retro-card p-4 border-l-8 border-l-red-600">
+                <h3 class="font-bold text-red-500">🆘 緊急聯絡</h3>
+                <p class="text-sm mt-2">駐日代表處 (緊急): +81-3-3280-7917</p>
+                <p class="text-sm">日本報警: 110 / 救護車: 119</p>
+            </div>
+        </section>
+
+        <section id="budget">
+            <h2 class="text-2xl font-black text-yellow-400 mb-4 italic italic uppercase">Budget Tracking 記帳</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr class="bg-gray-800 text-cyan-400">
+                            <th class="p-2 border border-gray-700">項目</th>
+                            <th class="p-2 border border-gray-700">沈</th>
+                            <th class="p-2 border border-gray-700">瑄</th>
+                            <th class="p-2 border border-gray-700">YO</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300">
+                        <tr>
+                            <td class="p-2 border border-gray-700">新幹線 (預算)</td>
+                            <td class="p-2 border border-gray-700">2860</td>
+                            <td class="p-2 border border-gray-700">2860</td>
+                            <td class="p-2 border border-gray-700">2860</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border border-gray-700">特急 Hida</td>
+                            <td class="p-2 border border-gray-700">3620</td>
+                            <td class="p-2 border border-gray-700">3620</td>
+                            <td class="p-2 border border-gray-700">3620</td>
+                        </tr>
+                        <tr class="font-bold text-white">
+                            <td class="p-2 border border-gray-700">小計 (JPY)</td>
+                            <td class="p-2 border border-gray-700 text-pink-500">6480</td>
+                            <td class="p-2 border border-gray-700 text-pink-500">6480</td>
+                            <td class="p-2 border border-gray-700 text-pink-500">6480</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-[10px] mt-2 text-gray-500">* 新幹線單程預估 2,860 羊，特急單程 3,620 羊 。</p>
+        </section>
+
+    </main>
+
+    <footer class="fixed bottom-0 left-0 w-full bg-black p-4 flex justify-between items-center border-t-2 border-cyan-400">
+        <div class="text-[10px] text-gray-400">
+            CURRENT: <span class="text-cyan-400">KANAZAWA MODE</span><br>
+            VERSION: 2.0.26
+        </div>
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="bg-cyan-500 text-black px-4 py-1 text-xs font-black">TOP ↑</button>
+    </footer>
+
+</body>
+</html>
