@@ -1,126 +1,1350 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
+<!doctype html>
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>2026 KANAZAWA TAKAYAMA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root { --main-color: #222; --accent-color: #BC6464; --bg-color: #FFFFFF; }
-        body { font-family: 'Noto Sans JP', sans-serif; background-color: var(--bg-color); color: var(--main-color); letter-spacing: -0.02em; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .nav-active { border-bottom: 3px solid var(--main-color); color: var(--main-color) !important; font-weight: 900; }
-        .schedule-card { border: 1.5px solid #F0F0F0; border-radius: 8px; padding: 24px; margin-bottom: 20px; transition: all 0.2s; }
-        .schedule-card:active { background-color: #FAFAFA; }
-        .time-label { font-size: 11px; font-weight: 900; color: #BBB; margin-bottom: 6px; display: block; letter-spacing: 0.1em; }
-        .location-name { font-size: 19px; font-weight: 900; margin-bottom: 10px; line-height: 1.2; }
-        input, select { border: 1px solid #DDD; border-radius: 4px; padding: 14px; width: 100%; margin-top: 6px; font-weight: 700; -webkit-appearance: none; }
-        .btn-primary { background: var(--main-color); color: white; padding: 18px; border-radius: 4px; width: 100%; font-weight: 900; margin-top: 24px; letter-spacing: 0.1em; }
-        .badge-red { border: 1px solid var(--accent-color); color: var(--accent-color); font-size: 10px; padding: 2px 6px; border-radius: 2px; font-weight: 900; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#F7F6F2" />
+  <title>金澤・高山・富山｜5天4夜旅遊小工具</title>
+  <style>
+    :root{
+      --bg:#F7F6F2;
+      --card:#FFFFFF;
+      --ink:#1F2937;
+      --muted:#6B7280;
+      --line:#E7E5E4;
+      --accent:#2E7D6B; /* 日式清爽綠 */
+      --accent2:#C65A3A; /* 暖磚 */
+      --shadow: 0 10px 25px rgba(31,41,55,.08);
+      --radius:18px;
+      --pad:16px;
+      --chip:#F3F4F6;
+
+      --tag-eat-bg:#FFF2E5;
+      --tag-eat-ink:#9A4B10;
+
+      --tag-order-bg:#EAF7FF;
+      --tag-order-ink:#0B5B7A;
+
+      --tag-buy-bg:#F2EAFF;
+      --tag-buy-ink:#5B2AA6;
+
+      --tag-code-bg:#FFE7EF;
+      --tag-code-ink:#8A1E49;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "PingFang TC", "Noto Sans TC", "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:var(--bg);
+      color:var(--ink);
+    }
+    a{color:inherit}
+    .safe{
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+      min-height: 100vh;
+      display:flex;
+      flex-direction:column;
+    }
+    header{
+      position:sticky; top:0; z-index:20;
+      background: color-mix(in srgb, var(--bg) 92%, white 8%);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar{
+      padding:14px var(--pad) 10px;
+      display:flex; align-items:flex-start; gap:12px;
+    }
+    .logo{
+      width:44px; height:44px;
+      border-radius:14px;
+      background: linear-gradient(145deg, #ffffff, #f0eee7);
+      border:1px solid var(--line);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 8px 18px rgba(0,0,0,.06);
+      flex:0 0 auto;
+    }
+    .logo svg{opacity:.95}
+    .title h1{
+      font-size:16px; margin:0; line-height:1.2;
+      letter-spacing:.2px;
+    }
+    .title p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .tabs{
+      display:flex;
+      gap:8px;
+      padding:0 var(--pad) 12px;
+      overflow:auto;
+      scrollbar-width:none;
+    }
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{
+      border:1px solid var(--line);
+      background: #fff;
+      padding:9px 12px;
+      border-radius:999px;
+      font-size:13px;
+      white-space:nowrap;
+      cursor:pointer;
+      transition: transform .08s ease, background .2s ease;
+    }
+    .tab[aria-selected="true"]{
+      border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+      background: color-mix(in srgb, var(--accent) 10%, #fff);
+    }
+    .content{
+      padding: 14px var(--pad) 28px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      max-width: 900px;
+      width:100%;
+      margin:0 auto;
+    }
+
+    .section-title{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      margin-top:4px;
+    }
+    .section-title h2{
+      font-size:14px;
+      margin:0;
+      letter-spacing:.2px;
+    }
+    .pill{
+      font-size:12px;
+      color:var(--muted);
+      background: color-mix(in srgb, var(--chip) 65%, white 35%);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 10px;
+      white-space:nowrap;
+    }
+
+    .day{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .day-head{
+      padding:14px 14px 12px;
+      border-bottom:1px dashed color-mix(in srgb, var(--line) 70%, transparent 30%);
+      background:
+        radial-gradient(800px 120px at 10% 0%, rgba(46,125,107,.10), transparent 60%),
+        radial-gradient(700px 120px at 90% 0%, rgba(198,90,58,.08), transparent 60%);
+    }
+    .day-head .row{
+      display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
+    }
+    .day-head h3{
+      margin:0;
+      font-size:15px;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
+    }
+    .weather{
+      flex:0 0 auto;
+      min-width: 126px;
+      text-align:right;
+    }
+    .wx{
+      font-weight:700;
+      font-size:14px;
+    }
+    .wx small{
+      display:block;
+      font-weight:600;
+      color:var(--muted);
+      font-size:11px;
+      margin-top:2px;
+    }
+    .wx-badge{
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+      justify-content:flex-end;
+      padding:7px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.8);
+      box-shadow: 0 10px 18px rgba(0,0,0,.05);
+      max-width: 200px;
+    }
+    .wx-badge span{white-space:nowrap}
+    .wx-icon{
+      width:18px;height:18px;
+      display:inline-block;
+    }
+
+    .cards{
+      padding: 12px 12px 14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .card{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding:12px;
+      background:#fff;
+    }
+    .card-top{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      align-items:flex-start;
+    }
+    .card h4{
+      margin:0;
+      font-size:14px;
+      line-height:1.2;
+    }
+    .meta{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
+    }
+    .right{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:flex-end;
+    }
+    .btn{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      padding:8px 10px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: #fff;
+      font-size:12px;
+      white-space:nowrap;
+      cursor:pointer;
+    }
+    .btn.primary{
+      border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+      background: color-mix(in srgb, var(--accent) 10%, #fff);
+    }
+    .btn svg{width:16px;height:16px;opacity:.9}
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:10px;
+    }
+    .chip{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: var(--chip);
+      border:1px solid var(--line);
+    }
+    .tag{border:0}
+    .tag.eat{background:var(--tag-eat-bg); color:var(--tag-eat-ink)}
+    .tag.order{background:var(--tag-order-bg); color:var(--tag-order-ink)}
+    .tag.buy{background:var(--tag-buy-bg); color:var(--tag-buy-ink)}
+    .tag.code{background:var(--tag-code-bg); color:var(--tag-code-ink); font-weight:800}
+    .divider{
+      height:1px;
+      background: var(--line);
+      margin:12px 0;
+    }
+    .note{
+      background: color-mix(in srgb, var(--accent) 7%, #fff);
+      border:1px solid color-mix(in srgb, var(--accent) 18%, var(--line));
+      padding:12px;
+      border-radius:16px;
+      color: color-mix(in srgb, var(--ink) 90%, var(--accent) 10%);
+      font-size:12.5px;
+      line-height:1.55;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    @media (min-width: 860px){
+      .grid{grid-template-columns: 1fr 1fr}
+    }
+
+    /* 表格（預算） */
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#fff;
+    }
+    th, td{
+      padding:10px 10px;
+      font-size:13px;
+      border-bottom:1px solid var(--line);
+      vertical-align:top;
+    }
+    th{
+      text-align:left;
+      background: color-mix(in srgb, var(--bg) 70%, #fff 30%);
+      font-size:12px;
+      color:var(--muted);
+      letter-spacing:.2px;
+    }
+    tr:last-child td{border-bottom:0}
+    input[type="text"], input[type="number"], select{
+      width:100%;
+      padding:9px 10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      font-size:14px;
+      background:#fff;
+    }
+    .row2{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr .8fr;
+      gap:10px;
+    }
+    .total{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#fff;
+      box-shadow: var(--shadow);
+      font-size:14px;
+    }
+    .kpi{
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+
+    /* 小小「原生感」底部空間 */
+    .footer-space{height:18px}
+
+    /* toast */
+    .toast{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom: 18px;
+      background: rgba(31,41,55,.92);
+      color:#fff;
+      padding:10px 12px;
+      border-radius:999px;
+      font-size:12px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+      max-width: calc(100vw - 28px);
+      text-align:center;
+    }
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-6px);
+    }
+  </style>
 </head>
-<body class="pb-32">
+<body>
+<div class="safe">
+  <header>
+    <div class="topbar">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+          <path d="M5 8.5c4.5-3.5 9.5-3.5 14 0" stroke="#2E7D6B" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M7 14c3.2-2.4 6.8-2.4 10 0" stroke="#C65A3A" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="12" cy="18.5" r="1.4" fill="#1F2937"/>
+        </svg>
+      </div>
+      <div class="title">
+        <h1>金澤・高山・富山｜5天4夜旅遊小工具</h1>
+        <p>手機優先｜行程卡片・導航・天氣・導遊筆記・記帳（沈/瑄/YO）</p>
+      </div>
+    </div>
+    <div class="tabs" role="tablist" aria-label="pages">
+      <button class="tab" role="tab" id="tab-itin" aria-selected="true" aria-controls="page-itin">行程</button>
+      <button class="tab" role="tab" id="tab-info" aria-selected="false" aria-controls="page-info">資訊</button>
+      <button class="tab" role="tab" id="tab-budget" aria-selected="false" aria-controls="page-budget">記帳/預算</button>
+      <button class="tab" role="tab" id="tab-notes" aria-selected="false" aria-controls="page-notes">小筆記</button>
+    </div>
+  </header>
 
-    <header class="p-8 pb-4">
-        <h1 class="text-3xl font-black tracking-tighter leading-none">KANAZAWA<br>TAKAYAMA</h1>
-        <div class="flex gap-4 mt-4 text-[10px] font-bold opacity-30 tracking-widest">
-            <span>2026.01.01 — 01.05</span>
-            <span>SHEN · XUAN · YO</span>
+  <main class="content">
+    <!-- 行程頁 -->
+    <section id="page-itin" role="tabpanel" aria-labelledby="tab-itin">
+      <div class="section-title">
+        <h2>每日行程</h2>
+        <span class="pill" id="todayHint">可在卡片右上角一鍵導航</span>
+      </div>
+      <div id="days"></div>
+      <div class="footer-space"></div>
+    </section>
+
+    <!-- 資訊頁 -->
+    <section id="page-info" role="tabpanel" aria-labelledby="tab-info" hidden>
+      <div class="section-title">
+        <h2>航班 / 住宿 / 緊急聯絡</h2>
+        <span class="pill">一頁集中，出國不用翻</span>
+      </div>
+
+      <div class="grid">
+        <div class="day">
+          <div class="day-head">
+            <div class="row">
+              <div>
+                <h3>✈️ 航班資訊</h3>
+                <p class="subtitle">長榮：去程 BR158、回程 BR157</p>
+              </div>
+              <div class="weather">
+                <div class="wx-badge">
+                  <span class="wx">提醒</span>
+                  <small class="muted">提早到機場、別壓線</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <div class="card-top">
+                <div>
+                  <h4>去程：桃園 → 小松（KMQ）</h4>
+                  <p class="meta">BR158｜06:35 - 10:25（桃園二航）</p>
+                </div>
+                <div class="right">
+                  <a class="btn primary" target="_blank" rel="noopener"
+                     href="https://www.google.com/maps/search/?api=1&query=桃園國際機場第二航廈">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12Z" stroke="currentColor" stroke-width="1.8"/><path d="M12 12.2a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.8"/></svg>
+                    導航機場
+                  </a>
+                </div>
+              </div>
+              <div class="chips">
+                <span class="chip tag code">重要：護照 / 入境資料 / 行李重量</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-top">
+                <div>
+                  <h4>回程：小松（KMQ）→ 桃園</h4>
+                  <p class="meta">BR157｜11:45 - 14:35</p>
+                </div>
+                <div class="right">
+                  <a class="btn primary" target="_blank" rel="noopener"
+                     href="https://www.google.com/maps/search/?api=1&query=小松空港">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12Z" stroke="currentColor" stroke-width="1.8"/><path d="M12 12.2a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.8"/></svg>
+                    導航小松機場
+                  </a>
+                </div>
+              </div>
+              <div class="chips">
+                <span class="chip">機場巴士：金澤站西口 → 小松空港（約40分）</span>
+              </div>
+            </div>
+          </div>
         </div>
-    </header>
 
-    <nav class="flex px-8 border-b border-gray-100 sticky top-0 bg-white z-50">
-        <button onclick="showTab('itinerary')" class="tab-btn nav-active py-4 mr-8 text-xs tracking-widest">ITINERARY</button>
-        <button onclick="showTab('budget')" class="tab-btn text-xs py-4 mr-8 text-gray-300 tracking-widest">BUDGET</button>
-        <button onclick="showTab('info')" class="tab-btn text-xs py-4 text-gray-300 tracking-widest">INFO</button>
-    </nav>
-
-    <main class="p-8">
-        <section id="tab-itinerary" class="tab-content active">
-            <div class="mb-14">
-                <div class="flex items-baseline gap-2 mb-8">
-                    <span class="text-5xl font-black italic tracking-tighter">01</span>
-                    <span class="text-xs font-black opacity-30">JAN. THU</span>
+        <div class="day">
+          <div class="day-head">
+            <div class="row">
+              <div>
+                <h3>🏨 住宿資訊</h3>
+                <p class="subtitle">SOKI KANAZAWA｜行李寄存可用</p>
+              </div>
+              <div class="weather">
+                <div class="wx-badge">
+                  <span class="wx">Check-in</span>
+                  <small>15:00 / 退房 11:00</small>
                 </div>
-                <div class="schedule-card">
-                    <span class="time-label">06:35 — 10:25</span>
-                    <div class="location-name">長榮航空 BR156</div>
-                    <p class="text-[11px] text-gray-400 font-medium">桃園機場報到 → 抵達小松機場</p>
-                </div>
-                <div class="schedule-card">
-                    <span class="time-label">13:00 TRANSFER</span>
-                    <div class="location-name">小松空港利木津巴士</div>
-                    <p class="text-[11px] text-gray-400 font-medium">往金澤站西口 (車程約40分)</p>
-                </div>
-                <div class="schedule-card border-black">
-                    <span class="time-label">AFTERNOON SPOT</span>
-                    <div class="location-name">高山老街散策</div>
-                    <div class="mt-4 space-y-3">
-                        <div class="text-[11px] border-l-2 border-black pl-3 py-1">
-                            <span class="badge-red mr-2">必買</span>星巴克高山岡本店 (限定木漆杯)
-                        </div>
-                        <div class="text-[11px] border-l-2 border-black pl-3 py-1">
-                            <span class="badge-red mr-2">必吃</span>高山布丁亭 (營業至 15:30)
-                        </div>
-                    </div>
-                </div>
+              </div>
             </div>
-
-            <div class="mb-14">
-                <div class="flex items-baseline gap-2 mb-8">
-                    <span class="text-5xl font-black italic tracking-tighter">02</span>
-                    <span class="text-xs font-black opacity-30">JAN. FRI</span>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <div class="card-top">
+                <div>
+                  <h4>SOKI KANAZAWA</h4>
+                  <p class="meta">2番1号 Fukuromachi, Kanazawa, Ishikawa 920-0909</p>
+                  <p class="meta small muted">（地址與入住退房時間依你的 PDF）</p>
                 </div>
-                <div class="schedule-card border-red-800">
-                    <span class="time-label text-red-800 font-black">10:00 NEW YEAR EVENT</span>
-                    <div class="location-name">金運 MZA 新年首賣</div>
-                    <p class="text-[11px] text-gray-400 font-medium">百貨新年營業開始</p>
+                <div class="right">
+                  <a class="btn primary" target="_blank" rel="noopener"
+                     href="https://www.google.com/maps/search/?api=1&query=SOKI%20KANAZAWA">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12Z" stroke="currentColor" stroke-width="1.8"/><path d="M12 12.2a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.8"/></svg>
+                    導航飯店
+                  </a>
                 </div>
-                <div class="schedule-card">
-                    <span class="time-label">CULTURE</span>
-                    <div class="location-name">21世紀美術館 & 兼六園</div>
-                    <p class="text-[11px] text-gray-400 font-medium mb-4 italic">※ 美術館內部需提前預約</p>
-                    <div class="text-[11px] border-l-2 border-black pl-3 py-1">
-                        <span class="badge-red mr-2">伴手禮</span>Le Musée de H (16:00 休息)
-                    </div>
-                </div>
+              </div>
+              <div class="chips">
+                <span class="chip">行李寄存：可先寄再逛（到站後很方便）</span>
+              </div>
             </div>
-        </section>
+          </div>
+        </div>
 
-        <section id="tab-budget" class="tab-content">
-            <h2 class="text-xl font-black mb-8 tracking-widest">EXPENSE LOG</h2>
-            <div class="bg-[#F9F9F9] p-6 rounded-sm mb-10">
-                <div class="space-y-4">
-                    <select id="exp-date">
-                        <option>1/1</option><option>1/2</option><option>1/3</option><option>1/4</option><option>1/5</option>
-                    </select>
-                    <input type="text" id="exp-name" placeholder="項目 (如: 無印良品)">
-                    <input type="number" id="exp-amount" placeholder="總金額 (JPY)">
-                    <select id="exp-payer">
-                        <option value="沈">由 沈 付款</option><option value="瑄">由 瑄 付款</option><option value="YO">由 YO 付款</option>
-                    </select>
-                    <select id="exp-split" onchange="toggleSplitDetail()">
-                        <option value="equally">3人平分</option>
-                        <option value="custom">自定義負擔 (沈付多/沈付少)</option>
-                    </select>
-                    <div id="split-detail" class="hidden space-y-4 pt-4 border-t border-gray-200">
-                        <div class="flex justify-between items-center"><span class="text-xs font-black">YO 負擔</span><input type="number" id="split-yo" class="w-1/2" placeholder="0"></div>
-                        <div class="flex justify-between items-center"><span class="text-xs font-black">瑄 負擔</span><input type="number" id="split-xuan" class="w-1/2" placeholder="0"></div>
-                        <p class="text-[10px] text-gray-400 italic">※ 沈將負擔剩餘金額，確保總額一致</p>
-                    </div>
+        <div class="day">
+          <div class="day-head">
+            <div class="row">
+              <div>
+                <h3>☎️ 緊急聯絡</h3>
+                <p class="subtitle">先存起來：需要時不用找網路</p>
+              </div>
+              <div class="weather">
+                <div class="wx-badge">
+                  <span class="wx">日本</span>
+                  <small>緊急電話</small>
                 </div>
-                <button class="btn-primary" onclick="saveExpense()">ADD RECORD</button>
+              </div>
             </div>
-            <div id="expense-list" class="space-y-4"></div>
-        </section>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <h4>緊急電話（日本）</h4>
+              <p class="meta">🚓 警察：110　　🚒/🚑 消防/救護：119</p>
+              <div class="divider"></div>
+              <h4>在地求助</h4>
+              <p class="meta">📞 Japan Visitor Hotline：050-3816-2787（全年無休，多語）</p>
+              <p class="meta small muted">＊若你們有保險公司/信用卡緊急專線，可在「小筆記」頁自行加上。</p>
+            </div>
+          </div>
+        </div>
 
-        <section id="tab-info" class="tab-content">
-            <h2 class="text-xl font-black mb-8 tracking-widest">STAY</h2>
-            <div class="schedule-card">
-                <div class="location-name">SOKI KANAZAWA</div>
-                <p class="text-xs text-gray-400 leading-relaxed font-bold">石川県金沢市袋町 2-1</p>
-                <div class="mt-6 flex gap-4">
-                    <div class="flex-1 border p-3 text-center"><span class="block text-[9px] opacity-30">IN</span><span class="text-xs font-black">15:00</span></div>
-                    <div class="flex-1 border p-3 text-center"><span class="block text-[9px] opacity-
+        <div class="day">
+          <div class="day-head">
+            <div class="row">
+              <div>
+                <h3>🚌 重要預約 / 交通連結</h3>
+                <p class="subtitle">把你 PDF 裡的關鍵連結集中</p>
+              </div>
+              <div class="weather">
+                <div class="wx-badge">
+                  <span class="wx">必看</span>
+                  <small>出發前確認</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <h4>金澤 → 高山 巴士（08:10 直達）</h4>
+              <p class="meta">預約：Japan Bus Online（你 PDF 註記的連結）</p>
+              <div class="chips">
+                <span class="chip tag code">重要預約代號：請在小筆記頁貼上（你們訂完後）</span>
+                <a class="btn" target="_blank" rel="noopener" href="https://japanbusonline.com/zh-tw">開啟預約網站</a>
+              </div>
+              <div class="divider"></div>
+              <h4>金澤 → 小松機場 巴士時刻</h4>
+              <div class="chips">
+                <a class="btn" target="_blank" rel="noopener" href="https://www.hokutetsu.co.jp/tc/airport/kanazawa/#section1">開啟時刻表</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="footer-space"></div>
+    </section>
+
+    <!-- 記帳/預算頁 -->
+    <section id="page-budget" role="tabpanel" aria-labelledby="tab-budget" hidden>
+      <div class="section-title">
+        <h2>記帳 / 預算表（沈 / 瑄 / YO）</h2>
+        <span class="pill">可離線用（會存在本機）</span>
+      </div>
+
+      <div class="note">
+        ✅ 你們三人旅行：輸入金額後可選「誰付」，也可選「平分」或自訂分攤。<br/>
+        ✅ 所有資料只存在你手機（localStorage），不會上傳。
+      </div>
+
+      <div class="day">
+        <div class="day-head">
+          <div class="row">
+            <div>
+              <h3>新增一筆花費</h3>
+              <p class="subtitle">例如：車票、餐費、伴手禮、住宿加購…</p>
+            </div>
+            <div class="weather">
+              <div class="wx-badge">
+                <span class="wx">小技巧</span>
+                <small>多用分類方便回顧</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cards">
+          <div class="row2">
+            <div>
+              <label class="small muted">項目</label>
+              <input id="expTitle" type="text" placeholder="例如：兼六園門票 / SWAY COFFEE" />
+            </div>
+            <div>
+              <label class="small muted">金額（JPY）</label>
+              <input id="expAmount" type="number" inputmode="numeric" placeholder="0" />
+            </div>
+            <div>
+              <label class="small muted">分類</label>
+              <select id="expCat">
+                <option value="交通">交通</option>
+                <option value="餐飲">餐飲</option>
+                <option value="景點">景點</option>
+                <option value="住宿">住宿</option>
+                <option value="購物">購物</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row2" style="margin-top:10px">
+            <div>
+              <label class="small muted">誰先付款</label>
+              <select id="expPayer">
+                <option value="沈">沈</option>
+                <option value="瑄">瑄</option>
+                <option value="YO">YO</option>
+              </select>
+            </div>
+            <div>
+              <label class="small muted">分攤方式</label>
+              <select id="expSplitMode">
+                <option value="equal">三人平分</option>
+                <option value="custom">自訂分攤</option>
+              </select>
+            </div>
+            <div style="display:flex; align-items:flex-end; gap:10px;">
+              <button class="btn primary" id="addExpense" style="width:100%; justify-content:center;">
+                ＋ 加入
+              </button>
+            </div>
+          </div>
+
+          <div id="customSplit" hidden style="margin-top:10px">
+            <div class="row2">
+              <div>
+                <label class="small muted">沈 分攤（JPY）</label>
+                <input id="splitShen" type="number" inputmode="numeric" placeholder="0" />
+              </div>
+              <div>
+                <label class="small muted">瑄 分攤（JPY）</label>
+                <input id="splitXuan" type="number" inputmode="numeric" placeholder="0" />
+              </div>
+              <div>
+                <label class="small muted">YO 分攤（JPY）</label>
+                <input id="splitYO" type="number" inputmode="numeric" placeholder="0" />
+              </div>
+            </div>
+            <p class="small muted" style="margin:8px 2px 0">
+              自訂分攤合計需等於金額；不等於時會提示。
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="total" style="margin-top:12px">
+        <div>
+          <div class="muted small">目前總支出（JPY）</div>
+          <div class="kpi" id="sumAll">0</div>
+        </div>
+        <div style="text-align:right">
+          <div class="muted small">清算：誰應收/應付</div>
+          <div class="kpi" id="settleHint">—</div>
+        </div>
+      </div>
+
+      <div class="day" style="margin-top:12px">
+        <div class="day-head">
+          <div class="row">
+            <div>
+              <h3>明細</h3>
+              <p class="subtitle">可刪除；長按可複製</p>
+            </div>
+            <div class="weather">
+              <button class="btn" id="clearAll">清空</button>
+            </div>
+          </div>
+        </div>
+        <div class="cards" id="expenseList"></div>
+      </div>
+
+      <div class="footer-space"></div>
+    </section>
+
+    <!-- 小筆記頁 -->
+    <section id="page-notes" role="tabpanel" aria-labelledby="tab-notes" hidden>
+      <div class="section-title">
+        <h2>小筆記（集合你們三人的資訊）</h2>
+        <span class="pill">預約代號/行李/必買清單</span>
+      </div>
+
+      <div class="day">
+        <div class="day-head">
+          <div class="row">
+            <div>
+              <h3>📌 重要預約代號（貼上就好）</h3>
+              <p class="subtitle">例如：巴士訂位、餐廳預約、門票QR等</p>
+            </div>
+          </div>
+        </div>
+        <div class="cards">
+          <textarea id="codes" rows="6" style="width:100%; padding:12px; border-radius:16px; border:1px solid var(--line); font-size:14px;"></textarea>
+          <button class="btn primary" id="saveCodes">儲存</button>
+          <div class="note">
+            建議格式：<br/>
+            ・金澤→高山巴士：訂位代號 XXXXX / 座位 XX<br/>
+            ・某餐廳：予約番号 XXXX / 到店時間 XX:XX
+          </div>
+        </div>
+      </div>
+
+      <div class="day">
+        <div class="day-head">
+          <div class="row">
+            <div>
+              <h3>🧳 行李/提醒</h3>
+              <p class="subtitle">你們每次都會有人忘記的那種</p>
+            </div>
+          </div>
+        </div>
+        <div class="cards">
+          <textarea id="reminders" rows="7" style="width:100%; padding:12px; border-radius:16px; border:1px solid var(--line); font-size:14px;"></textarea>
+          <button class="btn primary" id="saveRem">儲存</button>
+        </div>
+      </div>
+
+      <div class="footer-space"></div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast">已儲存</div>
+
+<script>
+  // ===== 基礎資料（依你的 PDF 行程整理）=====
+  // 城市座標：用於 Open-Meteo 天氣
+  const cityGeo = {
+    "金澤": { lat: 36.5613, lon: 136.6562 },
+    "高山": { lat: 36.1462, lon: 137.2522 },
+    "富山": { lat: 36.6953, lon: 137.2113 },
+    "小松": { lat: 36.3946, lon: 136.4066 },
+  };
+
+  // 行程（1/1-1/5）
+  const itinerary = [
+    {
+      date: "2026-01-01（四）",
+      city: "小松 → 金澤 → 富山 → 高山",
+      weatherCity: "高山",
+      focus: "抵達日本｜轉車進高山｜逛老街/酒造/限定杯",
+      cards: [
+        {
+          type: "交通",
+          title: "BR158 桃園 → 小松",
+          time: "06:35 - 10:25",
+          place: "小松機場 (Komatsu Airport)",
+          detail: "到機場報到（建議提早到）。",
+          navQuery: "小松空港"
+        },
+        {
+          type: "交通",
+          title: "金澤 → 富山 → 高山（指定席）",
+          time: "新幹線 劍 Tsurugi 60：06:51→07:14｜特急 飛驒 Hida 6：07:58→09:28",
+          place: "金澤站 / 富山站 / 高山站",
+          detail: "票價備註：新幹線 2,860円、特急 3,620円（單程）。",
+          navQuery: "金澤駅"
+        },
+        {
+          type: "餐廳",
+          title: "（想逛/想吃）高山老街路線",
+          time: "白天",
+          place: "星巴克 高山岡本店 / 舩坂酒造店 / みっふぃーおやつ堂 / 高山布丁亭",
+          detail: "建議用『走逛＋邊吃』模式：把想買的集中一條線。",
+          navQuery: "高山 岡本町"
+        },
+        {
+          type: "導遊",
+          title: "高山必吃＆攻略（快速版）",
+          time: "建議：午后～傍晚",
+          place: "三町筋（Sanmachi Suji）一帶",
+          detail:
+            "高山老街（商家町）以江戶風木造街景與『邊走邊吃』很有名：\n" +
+            "・必吃：飛驒牛（握壽司/串燒/可樂餅）\n" +
+            "・必吃：五平餅、みたらし団子\n" +
+            "・必喝：在地清酒（酒造多，可試飲）",
+          tags: [
+            { kind:"eat", text:"必吃：飛驒牛（握壽司/串燒）" },
+            { kind:"eat", text:"必吃：五平餅 / みたらし団子" },
+            { kind:"order", text:"必點：想吃就先買（熱門攤位易排）" },
+            { kind:"buy", text:"必買：限定杯/伴手禮（依你清單）" },
+          ],
+          navQuery: "高山 三町筋"
+        }
+      ]
+    },
+
+    {
+      date: "2026-01-02（五）",
+      city: "金澤",
+      weatherCity: "金澤",
+      focus: "金澤21世紀美術館｜Le Musée de H｜東茶屋街",
+      cards: [
+        {
+          type: "餐廳",
+          title: "早餐：東出珈琲店",
+          time: "09:00-10:00（你安排的時間）",
+          place: "東出珈琲店（Kanazawa）",
+          detail: "行前建議：如果客滿就備案找附近咖啡店。",
+          navQuery: "東出珈琲店 金沢"
+        },
+        {
+          type: "景點",
+          title: "金澤21世紀美術館（泳池必看）",
+          time: "09:00-18:00",
+          place: "21st Century Museum of Contemporary Art, Kanazawa",
+          detail:
+            "必看作品：Leandro Erlich《The Swimming Pool》——從上方看像真的泳池，實際只有薄薄水層，下方可走進『池底』拍照。",
+          tags: [
+            { kind:"order", text:"必拍：泳池上/下視角" },
+            { kind:"eat", text:"美術館周邊咖啡可當補血點" }
+          ],
+          navQuery: "金沢21世紀美術館"
+        },
+        {
+          type: "餐廳",
+          title: "Le Musée de H 金澤店（買伴手禮就好）",
+          time: "10:00-16:00（15:00最後點餐）",
+          place: "Le Musée de H Kanazawa",
+          detail: "你們的策略很正確：當『甜點伴手禮補給站』。",
+          tags: [
+            { kind:"buy", text:"必買：甜點伴手禮（可打包）" }
+          ],
+          navQuery: "Le Musée de H 金沢"
+        },
+        {
+          type: "景點",
+          title: "東茶屋街（散步＋甜點）",
+          time: "午後",
+          place: "Higashi Chaya District",
+          detail:
+            "金澤代表性的茶屋街。很多店會賣金箔甜點（像金箔霜淇淋）很有『金澤感』。",
+          tags: [
+            { kind:"eat", text:"必吃：金箔霜淇淋" },
+            { kind:"buy", text:"必買：金箔小物/點心" }
+          ],
+          navQuery: "東茶屋街"
+        }
+      ]
+    },
+
+    {
+      date: "2026-01-03（六）",
+      city: "金澤（站周邊購物日）",
+      weatherCity: "金澤",
+      focus: "金澤站＆FORUS 買買買｜取票/寄行李",
+      cards: [
+        {
+          type: "交通",
+          title: "小松機場 → 金澤站（利木津巴士）",
+          time: "約40分｜1,300円",
+          place: "金澤站西口",
+          detail: "到站後：先找販賣機取票 → 步行約5分鐘到 FORUS 寄行李再逛。",
+          navQuery: "金沢駅 西口"
+        },
+        {
+          type: "景點",
+          title: "金澤FORUS（百貨集中逛）",
+          time: "中午～傍晚",
+          place: "金澤FORUS",
+          detail:
+            "你 PDF 裡列的樓層清單：nico and... / Free-Spirits / UQ、無印、寶可夢中心 / ABC、LOFT / 星巴克 等。",
+          tags: [
+            { kind:"buy", text:"必買：想買就先下手（避免隔天跑回來）" }
+          ],
+          navQuery: "金沢フォーラス"
+        },
+        {
+          type: "導遊",
+          title: "金澤伴手禮方向（快速版）",
+          time: "購物日一起處理",
+          place: "站周邊 / 百貨 / 甜點店",
+          detail:
+            "金澤的『金箔』很有名，也常見可帶走的小點心與工藝小物。\n" +
+            "・伴手禮方向：金箔系甜點、加賀棒茶、和菓子\n" +
+            "・工藝方向：金箔小物、漆器/木製雜貨（你們已鎖定限定杯）",
+          tags: [
+            { kind:"buy", text:"必買：金箔系/加賀棒茶系" },
+            { kind:"order", text:"必做：先把『要買清單』在此日清掉" }
+          ],
+          navQuery: "金沢駅 お土産"
+        }
+      ]
+    },
+
+    {
+      date: "2026-01-04（日）",
+      city: "金澤",
+      weatherCity: "金澤",
+      focus: "兼六園＆金澤城｜超市採買｜片町散步",
+      cards: [
+        {
+          type: "景點",
+          title: "兼六園",
+          time: "08:00-17:00｜320円",
+          place: "Kenrokuen Garden",
+          detail: "冬天很值得看雪吊（Yukitsuri）景觀，整體氛圍很日式。",
+          tags: [
+            { kind:"order", text:"必拍：雪吊＋池景" }
+          ],
+          navQuery: "兼六園"
+        },
+        {
+          type: "景點",
+          title: "金澤城",
+          time: "08:00-17:00｜園區免費（部分展區付費）",
+          place: "Kanazawa Castle Park",
+          detail: "和兼六園同區，很適合安排連走。",
+          navQuery: "金沢城公園"
+        },
+        {
+          type: "購物",
+          title: "Kajimart Kanazawa M’ZA Store（超市採買）",
+          time: "10:00-19:30",
+          place: "Kajimart Kanazawa M’ZA Store",
+          detail: "採買完回飯店放，再繼續晚上的散步行程。",
+          navQuery: "Kajimart Kanazawa M'ZA"
+        },
+        {
+          type: "景點",
+          title: "神社參拜（三選一）",
+          time: "晚間",
+          place: "尾山神社 / 石浦神社 / 金澤神社",
+          detail: "依你們當下體力與動線選一間就好。",
+          navQuery: "尾山神社"
+        },
+        {
+          type: "餐廳",
+          title: "片町・關東煮＋扭蛋（C-pla）",
+          time: "晚間散步",
+          place: "片町商圈",
+          detail: "吃點熱的最舒服：關東煮 / 小吃；再去 C-pla 扭蛋收尾。",
+          tags: [
+            { kind:"eat", text:"必吃：關東煮（熱湯救命）" },
+            { kind:"buy", text:"必玩：C-pla 扭蛋" }
+          ],
+          navQuery: "金沢 片町"
+        }
+      ]
+    },
+
+    {
+      date: "2026-01-05（一）",
+      city: "金澤 → 小松 → 桃園",
+      weatherCity: "小松",
+      focus: "回程日｜提早移動｜平安到家",
+      cards: [
+        {
+          type: "交通",
+          title: "金澤 → 小松機場（巴士）",
+          time: "約40分｜建議提早",
+          place: "金澤站西口",
+          detail: "你 PDF 註記有時刻表連結；當天以最新班次為準。",
+          tags: [
+            { kind:"code", text:"重要：回程別壓線（預留塞車/排隊）" }
+          ],
+          navQuery: "金沢駅 西口"
+        },
+        {
+          type: "交通",
+          title: "BR157 小松 → 桃園",
+          time: "11:45 - 14:35",
+          place: "小松空港",
+          detail: "抵達：桃園二航。",
+          navQuery: "小松空港"
+        }
+      ]
+    },
+  ];
+
+  // ===== 導航 URL（Google Maps Search，免座標也能用）=====
+  function mapsSearchUrl(query){
+    return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query);
+  }
+
+  // ===== UI icons =====
+  const ICONS = {
+    "景點": `<svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6 7-12a7 7 0 1 0-14 0c0 6 7 12 7 12Z" stroke="currentColor" stroke-width="1.8"/><path d="M12 12.2a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.8"/></svg>`,
+    "餐廳": `<svg viewBox="0 0 24 24" fill="none"><path d="M7 3v9m0 0c0 2 2 2 2 0V3m-2 9c0 2-2 2-2 0V3m10 0v18m0-18c2 0 3 2 3 4v5h-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+    "交通": `<svg viewBox="0 0 24 24" fill="none"><path d="M4 16V7a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v9" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 16h11M7 20a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm10 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" stroke="currentColor" stroke-width="1.8"/></svg>`,
+    "購物": `<svg viewBox="0 0 24 24" fill="none"><path d="M6 8h15l-2 12H7L6 8Z" stroke="currentColor" stroke-width="1.8"/><path d="M9 8a3 3 0 0 1 6 0" stroke="currentColor" stroke-width="1.8"/></svg>`,
+    "導遊": `<svg viewBox="0 0 24 24" fill="none"><path d="M4 19V6a2 2 0 0 1 2-2h12v17l-6-3-6 3Z" stroke="currentColor" stroke-width="1.8"/></svg>`
+  };
+
+  function typeLabel(type){
+    const map = {
+      "景點":"景點",
+      "餐廳":"餐廳",
+      "交通":"交通",
+      "購物":"購物",
+      "導遊":"導遊"
+    };
+    return map[type] || type;
+  }
+
+  // ===== 天氣：Open-Meteo（免 key）=====
+  function wxIcon(code){
+    // 簡單映射，不追求完美
+    // https://open-meteo.com/en/docs
+    if(code === null || code === undefined) return "☁️";
+    if([0].includes(code)) return "☀️";
+    if([1,2,3].includes(code)) return "⛅️";
+    if([45,48].includes(code)) return "🌫️";
+    if([51,53,55,56,57].includes(code)) return "🌦️";
+    if([61,63,65,66,67].includes(code)) return "🌧️";
+    if([71,73,75,77].includes(code)) return "❄️";
+    if([80,81,82].includes(code)) return "🌧️";
+    if([85,86].includes(code)) return "🌨️";
+    if([95,96,99].includes(code)) return "⛈️";
+    return "☁️";
+  }
+
+  async function fetchWeather(city){
+    const geo = cityGeo[city];
+    if(!geo) return null;
+    const url =
+      `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}` +
+      `&current=temperature_2m,weather_code,wind_speed_10m` +
+      `&timezone=Asia%2FTokyo`;
+    try{
+      const res = await fetch(url, {cache:"no-store"});
+      if(!res.ok) throw new Error("weather fetch failed");
+      const data = await res.json();
+      const t = data?.current?.temperature_2m;
+      const code = data?.current?.weather_code;
+      const wind = data?.current?.wind_speed_10m;
+      return { t, code, wind };
+    }catch(e){
+      return { error:true };
+    }
+  }
+
+  // ===== 渲染每日卡片 =====
+  function cardTypePill(type){
+    const emoji = {
+      "景點":"📍",
+      "餐廳":"🍴",
+      "交通":"🚌",
+      "購物":"🛍️",
+      "導遊":"🧭"
+    }[type] || "•";
+    return `${emoji} ${typeLabel(type)}`;
+  }
+
+  function renderTag(tag){
+    const cls = tag.kind ? `tag ${tag.kind}` : "";
+    return `<span class="chip ${cls}">${escapeHtml(tag.text)}</span>`;
+  }
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function render(){
+    const root = document.getElementById("days");
+    root.innerHTML = itinerary.map((d, idx) => {
+      return `
+        <div class="day" data-day="${idx}">
+          <div class="day-head">
+            <div class="row">
+              <div>
+                <h3>${escapeHtml(d.date)}｜${escapeHtml(d.city)}</h3>
+                <p class="subtitle">${escapeHtml(d.focus)}</p>
+              </div>
+              <div class="weather">
+                <div class="wx-badge" id="wx-${idx}">
+                  <span class="wx">讀取天氣…</span>
+                  <small>${escapeHtml(d.weatherCity)}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cards">
+            ${d.cards.map(c => {
+              const nav = c.navQuery ? mapsSearchUrl(c.navQuery) : null;
+              const tags = (c.tags || []).map(renderTag).join("");
+              const icon = ICONS[c.type] || "";
+              return `
+                <div class="card">
+                  <div class="card-top">
+                    <div>
+                      <h4>${cardTypePill(c.type)}　${escapeHtml(c.title)}</h4>
+                      <p class="meta">${escapeHtml(c.time || "")}</p>
+                      <p class="meta"><b>${escapeHtml(c.place || "")}</b></p>
+                    </div>
+                    <div class="right">
+                      ${nav ? `
+                        <a class="btn primary" target="_blank" rel="noopener" href="${nav}">
+                          ${ICONS["景點"]}
+                          導航
+                        </a>` : ""
+                      }
+                      ${c.url ? `
+                        <a class="btn" target="_blank" rel="noopener" href="${c.url}">
+                          🔗 連結
+                        </a>` : ""
+                      }
+                    </div>
+                  </div>
+                  ${c.detail ? `<p class="meta" style="white-space:pre-line">${escapeHtml(c.detail)}</p>` : ""}
+                  ${tags ? `<div class="chips">${tags}</div>` : ""}
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  async function hydrateWeather(){
+    for(let i=0;i<itinerary.length;i++){
+      const city = itinerary[i].weatherCity;
+      const box = document.getElementById(`wx-${i}`);
+      const wx = await fetchWeather(city);
+      if(!box) continue;
+      if(!wx || wx.error){
+        box.innerHTML = `<span class="wx">天氣讀取失敗</span><small>${city}</small>`;
+        continue;
+      }
+      const icon = wxIcon(wx.code);
+      const t = (wx.t ?? "—");
+      const wind = (wx.wind ?? "—");
+      box.innerHTML = `
+        <span class="wx">${icon} ${t}°C</span>
+        <small>${city}｜風 ${wind} km/h</small>
+      `;
+    }
+  }
+
+  // ===== Tabs =====
+  const tabs = [
+    { tab:"tab-itin", page:"page-itin" },
+    { tab:"tab-info", page:"page-info" },
+    { tab:"tab-budget", page:"page-budget" },
+    { tab:"tab-notes", page:"page-notes" },
+  ];
+
+  function setTab(activeId){
+    for(const t of tabs){
+      const btn = document.getElementById(t.tab);
+      const page = document.getElementById(t.page);
+      const active = (t.tab === activeId);
+      btn.setAttribute("aria-selected", active ? "true" : "false");
+      page.hidden = !active;
+    }
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  tabs.forEach(t=>{
+    document.getElementById(t.tab).addEventListener("click", ()=>setTab(t.tab));
+  });
+
+  // ===== 記帳（localStorage）=====
+  const LS_KEY = "trip_expenses_kanazawa_2026";
+  const LS_CODES = "trip_codes_kanazawa_2026";
+  const LS_REM = "trip_rem_kanazawa_2026";
+
+  function loadExpenses(){
+    try{ return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
+    catch{ return []; }
+  }
+  function saveExpenses(list){
+    localStorage.setItem(LS_KEY, JSON.stringify(list));
+  }
+  function money(n){
+    const x = Number(n||0);
+    return x.toLocaleString("en-US");
+  }
+  function toast(msg="已儲存"){
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"), 1400);
+  }
+
+  function calcSettlement(expenses){
+    // 回傳：每個人 paid / share / net(應收為正，應付為負)
+    const people = ["沈","瑄","YO"];
+    const paid = Object.fromEntries(people.map(p=>[p,0]));
+    const share = Object.fromEntries(people.map(p=>[p,0]));
+
+    for(const e of expenses){
+      paid[e.payer] += e.amount;
+      share["沈"] += e.split?.沈 ?? 0;
+      share["瑄"] += e.split?.瑄 ?? 0;
+      share["YO"] += e.split?.YO ?? 0;
+    }
+    const net = Object.fromEntries(people.map(p=>[p, paid[p]-share[p]]));
+    return {paid, share, net};
+  }
+
+  function renderExpenses(){
+    const list = loadExpenses();
+    const wrap = document.getElementById("expenseList");
+    const sum = list.reduce((a,b)=>a+Number(b.amount||0),0);
+    document.getElementById("sumAll").textContent = money(sum);
+
+    const st = calcSettlement(list);
+    // 找最大應收與最大應付做一句提示
+    const entries = Object.entries(st.net);
+    const recv = entries.reduce((best, cur)=> cur[1]>best[1]?cur:best, ["", -1e18]);
+    const pay  = entries.reduce((best, cur)=> cur[1]<best[1]?cur:best, ["",  1e18]);
+    const hint = (sum===0) ? "—" : `${pay[0]} → ${recv[0]}（概算）`;
+    document.getElementById("settleHint").textContent = hint;
+
+    wrap.innerHTML = list.length ? list.map((e, idx)=>{
+      const nav = e.title ? mapsSearchUrl(e.title) : null;
+      return `
+        <div class="card" data-idx="${idx}">
+          <div class="card-top">
+            <div>
+              <h4>${escapeHtml(e.title || "（未命名）")}</h4>
+              <p class="meta">${escapeHtml(e.cat)}｜付款：${escapeHtml(e.payer)}｜金額：<b>${money(e.amount)}</b> 円</p>
+              <p class="meta small muted">分攤：沈 ${money(e.split.沈)} / 瑄 ${money(e.split.瑄)} / YO ${money(e.split.YO)}</p>
+            </div>
+            <div class="right">
+              ${nav ? `<a class="btn" target="_blank" rel="noopener" href="${nav}">🔎 查地點</a>`:""}
+              <button class="btn" onclick="deleteExpense(${idx})">刪除</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("") : `<div class="note">目前沒有明細。先加一筆看看～</div>`;
+  }
+
+  window.deleteExpense = function(idx){
+    const list = loadExpenses();
+    list.splice(idx,1);
+    saveExpenses(list);
+    renderExpenses();
+    toast("已刪除");
+  }
+
+  function setupBudget(){
+    const mode = document.getElementById("expSplitMode");
+    const custom = document.getElementById("customSplit");
+    mode.addEventListener("change", ()=>{
+      custom.hidden = (mode.value !== "custom");
+    });
+
+    document.getElementById("addExpense").addEventListener("click", ()=>{
+      const title = document.getElementById("expTitle").value.trim();
+      const amount = Number(document.getElementById("expAmount").value);
+      const cat = document.getElementById("expCat").value;
+      const payer = document.getElementById("expPayer").value;
+      const splitMode = mode.value;
+
+      if(!amount || amount<=0){
+        toast("請輸入金額");
+        return;
+      }
+
+      let split;
+      if(splitMode === "equal"){
+        const base = Math.floor(amount/3);
+        const rem = amount - base*3;
+        // 把餘數分配給前面的人（讓合計正確）
+        split = { 沈: base + (rem>0?1:0), 瑄: base + (rem>1?1:0), YO: base };
+      }else{
+        const s = Number(document.getElementById("splitShen").value||0);
+        const x = Number(document.getElementById("splitXuan").value||0);
+        const y = Number(document.getElementById("splitYO").value||0);
+        if(s+x+y !== amount){
+          toast("自訂分攤合計需等於金額");
+          return;
+        }
+        split = { 沈:s, 瑄:x, YO:y };
+      }
+
+      const list = loadExpenses();
+      list.unshift({
+        title: title || `（${cat}）`,
+        amount,
+        cat,
+        payer,
+        split,
+        ts: Date.now()
+      });
+      saveExpenses(list);
+
+      document.getElementById("expTitle").value = "";
+      document.getElementById("expAmount").value = "";
+      document.getElementById("splitShen").value = "";
+      document.getElementById("splitXuan").value = "";
+      document.getElementById("splitYO").value = "";
+
+      renderExpenses();
+      toast("已加入");
+    });
+
+    document.getElementById("clearAll").addEventListener("click", ()=>{
+      if(confirm("確定要清空所有記帳資料嗎？（只清本機）")){
+        localStorage.removeItem(LS_KEY);
+        renderExpenses();
+        toast("已清空");
+      }
+    });
+
+    renderExpenses();
+  }
+
+  // ===== 小筆記：重要代號 / 提醒 =====
+  function setupNotes(){
+    const codes = document.getElementById("codes");
+    const rem = document.getElementById("reminders");
+    codes.value = localStorage.getItem(LS_CODES) || "";
+    rem.value = localStorage.getItem(LS_REM) || "";
+
+    document.getElementById("saveCodes").addEventListener("click", ()=>{
+      localStorage.setItem(LS_CODES, codes.value);
+      toast("代號已儲存");
+    });
+    document.getElementById("saveRem").addEventListener("click", ()=>{
+      localStorage.setItem(LS_REM, rem.value);
+      toast("提醒已儲存");
+    });
+  }
+
+  // ===== init =====
+  render();
+  hydrateWeather();
+  setupBudget();
+  setupNotes();
+</script>
+</body>
+</html>
