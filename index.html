@@ -1,29 +1,246 @@
-import React, { useState } from 'react';
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>2026 KANAZAWA | 旅遊小管家</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-warm: #F7F3F0;
+            --text-dark: #222222;
+            --accent-red: #BC6464;
+            --accent-green: #6B8E23;
+        }
+        body {
+            font-family: 'Noto Sans JP', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-warm);
+            color: var(--text-dark);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* 橫向捲動日期選擇器樣式 */
+        .date-slider::-webkit-scrollbar { display: none; }
+        .active-date { background: var(--text-dark); color: white; transform: scale(1.05); }
+        
+        /* 軟陰影 */
+        .soft-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+        
+        /* 記帳鍵盤優化 */
+        input[type="number"] { font-size: 1.2rem; font-weight: 700; }
+    </style>
+</head>
+<body class="pb-24">
 
-export default function App() {
-  const [day, setDay] = useState(0);
-  const travelData = [
-    { date: "1/1", title: "金澤抵達日", list: ["長榮 BR158", "利木津巴士", "片町關東煮"] },
-    { date: "1/2", title: "高山一日遊", list: ["新幹線 劍", "高山老街", "高山布丁亭"] },
-    { date: "1/3", title: "富山移動日", list: ["東出珈琲店", "富山市區"] }
-  ];
+    <header class="px-6 pt-12 pb-4">
+        <div class="flex justify-between items-end">
+            <div>
+                <h1 class="text-3xl font-black tracking-tighter">KANAZAWA</h1>
+                <p class="text-xs opacity-40 font-bold uppercase tracking-widest mt-1">2026.01.01 — 01.05</p>
+            </div>
+            <div class="text-right">
+                <span class="text-[10px] block opacity-40 font-black">DEPARTURE IN</span>
+                <span class="text-xl font-black italic text-red-700" id="countdown">-- DAYS</span>
+            </div>
+        </div>
+    </header>
 
-  return (
-    <div style={{ backgroundColor: '#F9F7F2', minHeight: '100vh', padding: '20px', fontFamily: 'sans-serif', color: '#4A5D4E' }}>
-      <h1 style={{ textAlign: 'center' }}>⛩️ 金澤行程規劃</h1>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
-        {travelData.map((d, i) => (
-          <button key={i} onClick={() => setDay(i)} style={{ padding: '10px', borderRadius: '10px', border: 'none', backgroundColor: day === i ? '#4A5D4E' : 'white', color: day === i ? 'white' : '#4A5D4E' }}>
-            {d.date}
-          </button>
-        ))}
-      </div>
-      <div style={{ backgroundColor: 'white', borderRadius: '20px', padding: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-        <h2 style={{ borderBottom: '1px solid #eee', paddingBottom: '10px' }}>{travelData[day].title}</h2>
-        <ul style={{ lineHeight: '2.5' }}>
-          {travelData[day].list.map((item, i) => <li key={i}>{item}</li>)}
-        </ul>
-      </div>
+    <main class="px-5">
+        
+        <section id="tab-schedule" class="tab-content active">
+            <div class="date-slider flex overflow-x-auto gap-3 py-4 mb-4">
+                <button onclick="filterDay(1)" class="day-btn active-date flex-shrink-0 w-16 h-20 rounded-2xl flex flex-col items-center justify-center border border-stone-200">
+                    <span class="text-[10px] font-bold opacity-60">JAN</span>
+                    <span class="text-xl font-black">01</span>
+                </button>
+                <button onclick="filterDay(2)" class="day-btn bg-white flex-shrink-0 w-16 h-20 rounded-2xl flex flex-col items-center justify-center border border-stone-100 soft-shadow text-stone-400">
+                    <span class="text-[10px] font-bold">JAN</span>
+                    <span class="text-xl font-black">02</span>
+                </button>
+                <button onclick="filterDay(3)" class="day-btn bg-white flex-shrink-0 w-16 h-20 rounded-2xl flex flex-col items-center justify-center border border-stone-100 soft-shadow text-stone-400">
+                    <span class="text-[10px] font-bold">JAN</span>
+                    <span class="text-xl font-black">03</span>
+                </button>
+                </div>
+
+            <div class="bg-white/50 border border-stone-200 rounded-3xl p-4 flex justify-between items-center mb-6">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-cloud-snow text-2xl text-stone-400"></i>
+                    <div>
+                        <span class="text-xs font-bold block opacity-50">金澤預報</span>
+                        <span class="text-sm font-black italic">❄️ -2°C / 4°C</span>
+                    </div>
+                </div>
+                <span class="text-[10px] bg-stone-200 px-2 py-1 rounded-full font-bold uppercase">Rainy 40%</span>
+            </div>
+
+            <div class="space-y-6" id="schedule-list">
+                <div class="relative pl-8 border-l-2 border-dashed border-stone-200">
+                    <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-800"></div>
+                    <span class="text-[10px] font-black opacity-30">06:35 — 10:25 </span>
+                    <div class="bg-white p-4 rounded-2xl mt-1 soft-shadow border border-stone-50">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-base">✈️ 長榮航空 BR156 </h3>
+                            <span class="text-[9px] px-2 py-1 bg-blue-50 text-blue-600 rounded-lg font-black uppercase">交通</span>
+                        </div>
+                        <p class="text-xs text-stone-400 mt-1">桃園二航 → 小松機場 </p>
+                    </div>
+                </div>
+
+                <div class="relative pl-8 border-l-2 border-dashed border-stone-200">
+                    <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-200 border-4 border-white"></div>
+                    <span class="text-[10px] font-black opacity-30">13:00 </span>
+                    <div class="bg-white p-4 rounded-2xl mt-1 soft-shadow border border-stone-50">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-base">小松利木津巴士 </h3>
+                        </div>
+                        <p class="text-xs text-stone-400 mt-1">往金澤站西口 (約40分) </p>
+                        <a href="#" class="mt-3 inline-block text-[10px] font-bold underline text-stone-400"><i class="fa-solid fa-location-dot mr-1"></i>查看地圖連結 </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-bookings" class="tab-content">
+            <h2 class="text-xl font-black mb-6 italic tracking-tight underline decoration-red-200 decoration-4">BOARDING PASS</h2>
+            
+            <div class="bg-white rounded-3xl overflow-hidden soft-shadow border border-stone-100 mb-6">
+                <div class="bg-stone-800 p-4 flex justify-between items-center">
+                    <span class="text-xs text-white/50 font-bold uppercase">Eva Air</span>
+                    <span class="text-xs text-white/50 font-bold">BR156</span>
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-center text-center">
+                        <div><span class="text-3xl font-black">TPE</span><span class="block text-[10px] opacity-40">TAIPEI</span></div>
+                        <i class="fa-solid fa-plane text-stone-200"></i>
+                        <div><span class="text-3xl font-black">KMQ</span><span class="block text-[10px] opacity-40">KOMATSU</span></div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-dashed border-stone-100 flex justify-between text-xs">
+                        <div><span class="opacity-40 block">DATE</span><span class="font-bold">JAN 01 </span></div>
+                        <div><span class="opacity-40 block">BOARDING</span><span class="font-bold">06:05</span></div>
+                        <div><span class="opacity-40 block">GATE</span><span class="font-bold">T2</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-black mb-4 italic tracking-tight underline decoration-green-200 decoration-4">STAY</h2>
+            <div class="bg-white p-4 rounded-3xl soft-shadow border border-stone-100">
+                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&q=80&w=400" class="w-full h-32 object-cover rounded-2xl mb-4 opacity-80" alt="Hotel">
+                <h3 class="font-black text-lg text-stone-800 uppercase">SOKI KANAZAWA </h3>
+                <p class="text-[11px] text-stone-400 mt-1">石川県金沢市袋町 2-1 </p>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div class="bg-stone-50 p-3 rounded-xl border border-stone-100 text-center">
+                        <span class="text-[9px] opacity-40 block uppercase">Check In</span>
+                        <span class="font-bold text-xs italic">15:00 </span>
+                    </div>
+                    <div class="bg-stone-50 p-3 rounded-xl border border-stone-100 text-center">
+                        <span class="text-[9px] opacity-40 block uppercase">Check Out</span>
+                        <span class="font-bold text-xs italic">11:00 </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-expense" class="tab-content">
+            <div class="bg-stone-800 rounded-3xl p-6 text-white mb-8 soft-shadow">
+                <span class="text-[10px] font-black opacity-40 tracking-widest uppercase">Total Budget (JPY)</span>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <h3 class="text-4xl font-black tracking-tighter italic">¥ 124,500</h3>
+                    <span class="text-xs opacity-40">≈ NT$ 26,800</span>
+                </div>
+                <div class="mt-6 flex gap-4">
+                    <div class="flex-1"><span class="text-[9px] opacity-40 block uppercase">Shen</span><span class="text-sm font-bold tracking-tight italic">¥ 41,500</span></div>
+                    <div class="flex-1"><span class="text-[9px] opacity-40 block uppercase">Xuan</span><span class="text-sm font-bold tracking-tight italic">¥ 41,500</span></div>
+                    <div class="flex-1"><span class="text-[9px] opacity-40 block uppercase">YO</span><span class="text-sm font-bold tracking-tight italic">¥ 41,500</span></div>
+                </div>
+            </div>
+
+            <button onclick="toggleModal('expense-modal')" class="btn-primary w-full bg-white text-stone-800 border-2 border-stone-800 py-4 rounded-2xl font-black text-sm tracking-widest flex items-center justify-center gap-2 mb-8">
+                <i class="fa-solid fa-plus"></i> NEW EXPENSE
+            </button>
+
+            <h2 class="text-sm font-black mb-4 opacity-40 tracking-widest uppercase italic">Daily Transactions</h2>
+            <div class="space-y-3" id="expense-list">
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center border border-stone-50">
+                    <div>
+                        <span class="text-[9px] font-black opacity-30 block">JAN 01 · 交通 </span>
+                        <span class="font-bold text-sm">新幹線 劍 60號 </span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-black text-red-700 italic">¥ 2,860 </span>
+                        <span class="text-[9px] block opacity-40">沈付款 </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="expense-modal" class="hidden fixed inset-0 z-[60] bg-black/40 flex items-end">
+        <div class="bg-white w-full rounded-t-[40px] p-8 pb-12 animate-slide-up">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-xl font-black italic">ADD RECORD</h2>
+                <button onclick="toggleModal('expense-modal')" class="text-stone-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="space-y-6">
+                <div><label class="text-[10px] font-black opacity-30 uppercase block mb-1">Amount (JPY)</label><input type="number" inputmode="numeric" placeholder="0" class="w-full text-3xl font-black border-b border-stone-200 outline-none pb-2 focus:border-stone-800 transition-all"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="text-[10px] font-black opacity-30 uppercase block mb-1">Category</label><select class="w-full bg-stone-50 border-none rounded-xl p-3 text-sm font-bold"><option>美食</option><option>交通 </option><option>景點</option><option>購物</option></select></div>
+                    <div><label class="text-[10px] font-black opacity-30 uppercase block mb-1">Payer</label><select class="w-full bg-stone-50 border-none rounded-xl p-3 text-sm font-bold"><option>沈 </option><option>瑄 </option><option>YO </option></select></div>
+                </div>
+                <button class="w-full bg-stone-800 text-white py-4 rounded-2xl font-black text-sm tracking-widest mt-4">SAVE DATA</button>
+            </div>
+        </div>
     </div>
-  );
-}
+
+    <nav class="fixed bottom-0 left-0 right-0 glass-nav h-20 bg-white/80 backdrop-blur-lg flex items-center justify-around px-4 border-t border-stone-100 z-50">
+        <button onclick="showTab('schedule')" class="tab-btn active text-stone-800 flex flex-col items-center gap-1 transition-all"><i class="fa-solid fa-calendar-day text-lg"></i><span class="text-[9px] font-black uppercase">Schedule </span></button>
+        <button onclick="showTab('bookings')" class="tab-btn text-stone-300 flex flex-col items-center gap-1 transition-all"><i class="fa-solid fa-ticket text-lg"></i><span class="text-[9px] font-black uppercase">Bookings </span></button>
+        <button onclick="showTab('expense')" class="tab-btn text-stone-300 flex flex-col items-center gap-1 transition-all"><i class="fa-solid fa-wallet text-lg"></i><span class="text-[9px] font-black uppercase">Expense </span></button>
+    </nav>
+
+    <script>
+        // 1. 分頁邏輯
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.add('text-stone-300');
+                b.classList.remove('text-stone-800');
+            });
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.currentTarget.classList.add('text-stone-800');
+            event.currentTarget.classList.remove('text-stone-300');
+        }
+
+        // 2. Modal 邏輯
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.toggle('hidden');
+        }
+
+        // 3. 倒數計時邏輯 (距離 2026.01.01)
+        function updateCountdown() {
+            const target = new Date("2026/01/01").getTime();
+            const now = new Date().getTime();
+            const diff = target - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('countdown').innerText = days + " DAYS";
+        }
+        updateCountdown();
+
+        // 4. 日期過濾 (範例)
+        function filterDay(day) {
+            document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active-date'));
+            event.currentTarget.classList.add('active-date');
+            // 此處可擴充 Firestore 過濾邏輯
+        }
+    </script>
+</body>
+</html>
