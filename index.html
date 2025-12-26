@@ -772,36 +772,34 @@
         setForm((f) => ({ ...f, allocations: { ...f.allocations, [name]: value.replace(/[^\d]/g, "") } }));
       };
 
-      const splitEven = () => {
+ const splitEven = () => {
         const total = Number(form.total || 0);
         if (!total || total <= 0) return alert("請先輸入總金額（> 0）");
 
         const base = Math.floor(total / PEOPLE.length); 
-        let rem = total - base * PEOPLE.length; // 餘數 (1 或 2)
+        const rem = total - base * PEOPLE.length; 
 
         const payer = form.payer;
-        // 找出除了代墊人以外的人
         const others = PEOPLE.filter((p) => p !== payer); 
 
-        // 先讓每個人都拿 base
+        // 1. 初始化分配，大家都先拿底數
         const alloc = Object.fromEntries(PEOPLE.map((p) => [p, base]));
 
         if (rem > 0) {
-          // --- 公平隨機邏輯 ---
-          // 從 others 裡面隨機洗牌（Shuffle）
+          // 2. 公平隨機：將非代墊人名單隨機排序
           const shuffledOthers = [...others].sort(() => Math.random() - 0.5);
           
-          // 依序把餘數分給隨機排序後的非代墊人
+          // 3. 將餘數分給排序靠前的人
           for (let k = 0; k < rem; k++) {
-            const target = shuffledOthers[k] || payer; 
-            alloc[target] += 1;
+            alloc[shuffledOthers[k]] += 1;
           }
         }
 
-        setForm((f) => ({
-          ...f,
-          allocations: Object.fromEntries(PEOPLE.map((p) => [p, String(alloc[p])])),
-        }));
+        // 4. 強制更新狀態：確保 React 感知到變化
+        setForm({
+          ...form,
+          allocations: Object.fromEntries(PEOPLE.map((p) => [p, String(alloc[p])]))
+        });
       };
 
       const addEntry = () => {
