@@ -775,16 +775,33 @@
       const splitEven = () => {
         const total = Number(form.total || 0);
         if (!total || total <= 0) return alert("請先輸入總金額（> 0）");
-        const base = Math.floor(total / PEOPLE.length);
-        const rem = total - base * PEOPLE.length;
+
+        const base = Math.floor(total / PEOPLE.length); 
+        let rem = total - base * PEOPLE.length; // 餘數 (1 或 2)
+
         const payer = form.payer;
-        const others = PEOPLE.filter((p) => p !== payer);
+        // 找出除了代墊人以外的人
+        const others = PEOPLE.filter((p) => p !== payer); 
+
+        // 先讓每個人都拿 base
         const alloc = Object.fromEntries(PEOPLE.map((p) => [p, base]));
-        for (let k = 0; k < rem; k++) {
-          const target = others[k % others.length] || payer;
-          alloc[target] += 1;
+
+        if (rem > 0) {
+          // --- 公平隨機邏輯 ---
+          // 從 others 裡面隨機洗牌（Shuffle）
+          const shuffledOthers = [...others].sort(() => Math.random() - 0.5);
+          
+          // 依序把餘數分給隨機排序後的非代墊人
+          for (let k = 0; k < rem; k++) {
+            const target = shuffledOthers[k] || payer; 
+            alloc[target] += 1;
+          }
         }
-        setForm((f) => ({ ...f, allocations: Object.fromEntries(PEOPLE.map((p) => [p, String(alloc[p])])) }));
+
+        setForm((f) => ({
+          ...f,
+          allocations: Object.fromEntries(PEOPLE.map((p) => [p, String(alloc[p])])),
+        }));
       };
 
       const addEntry = () => {
