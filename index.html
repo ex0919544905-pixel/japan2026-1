@@ -539,18 +539,6 @@
       const [selectedItem, setSelectedItem] = useState(null);
       const items = scheduleByDay[dayKey] ?? [];
 
-      const [noteDraft, setNoteDraft] = useState("");
-      useEffect(() => {
-        if (!selectedItem) return;
-        setNoteDraft(selectedItem.note || "");
-      }, [selectedItem]);
-
-      const onSaveNote = () => {
-        if (!selectedItem) return;
-        updateNote(dayKey, selectedItem.id, noteDraft);
-        setSelectedItem((s) => (s ? { ...s, note: noteDraft } : s));
-      };
-
       return (
         <div className="mx-auto max-w-md px-4 pb-28 pt-4">
           <DateStrip selected={dayKey} onSelect={setDayKey} />
@@ -580,21 +568,9 @@
                   </span>
                 </div>
                 <Card className="p-3">
-                  <div className="text-xs text-sand-500">備註（可編輯）</div>
-                  <textarea
-                    value={noteDraft}
-                    onChange={(e) => setNoteDraft(e.target.value)}
-                    rows={4}
-                    placeholder="例如：要買的東西、集合時間提醒、備用方案…"
-                    className="mt-2 w-full rounded-2xl bg-white px-3 py-3 text-sm leading-relaxed ring-1 ring-sand-100 focus:outline-none"
-                  />
-                  <div className="mt-2 flex gap-2">
-                    <button onClick={onSaveNote} className="flex-1 rounded-2xl bg-moss-600 px-4 py-3 text-sm font-semibold text-white shadow-soft hover:bg-moss-700">
-                      儲存備註
-                    </button>
-                    <button onClick={() => setNoteDraft(selectedItem.note || "")} className="flex-1 rounded-2xl bg-white px-4 py-3 text-sm font-semibold shadow-soft ring-1 ring-sand-100 hover:bg-sand-50">
-                      還原
-                    </button>
+                  <div className="text-xs text-sand-500">備註</div>
+                  <div className="mt-2 w-full rounded-2xl bg-white px-3 py-3 text-sm leading-relaxed ring-1 ring-sand-100 text-sand-800">
+                    {selectedItem.note || "暫無備註"}
                   </div>
                 </Card>
                 <div className="flex gap-2">
