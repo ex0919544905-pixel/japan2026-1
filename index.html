@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#3F5B3B" />
-  
+
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  
+
   <meta name="apple-mobile-web-app-title" content="2026日本北陸" />
   <title>2026日本北陸旅行</title>
 
@@ -70,7 +70,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  
+
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -158,16 +158,18 @@
     const LOC_BY_DAY = {
       "2026-01-01": { name: "金澤", lat: 36.5613, lon: 136.6562 },
       "2026-01-02": { name: "高山", lat: 36.1333, lon: 137.25 },
-      "2026-01-03": { name: "富山", lat: 36.696, lon: 137.214 },
-      "2026-01-04": { name: "金澤", lat: 36.5613, lon: 136.6562 },
+      "2026-01-03": { name: "金澤", lat: 36.5613, lon: 136.6562 },
+      "2026-01-04": { name: "富山", lat: 36.696, lon: 137.214 },
       "2026-01-05": { name: "小松", lat: 36.3946, lon: 136.4066 },
     };
 
+    // 新增：逛街
     const CATEGORY = {
       sight: { label: "景點", pill: "bg-moss-100 text-moss-800 ring-1 ring-moss-200", dot: "bg-moss-500" },
-      food: { label: "美食", pill: "bg-clay-100 text-clay-800 ring-1 ring-clay-200", dot: "bg-clay-500" },
-      move: { label: "交通", pill: "bg-sand-100 text-sand-800 ring-1 ring-sand-200", dot: "bg-sand-500" },
-      stay: { label: "住宿", pill: "bg-slate-100 text-slate-700 ring-1 ring-slate-200", dot: "bg-slate-500" },
+      food:  { label: "美食", pill: "bg-clay-100 text-clay-800 ring-1 ring-clay-200", dot: "bg-clay-500" },
+      move:  { label: "交通", pill: "bg-sand-100 text-sand-800 ring-1 ring-sand-200", dot: "bg-sand-500" },
+      stay:  { label: "住宿", pill: "bg-slate-100 text-slate-700 ring-1 ring-slate-200", dot: "bg-slate-500" },
+      shop:  { label: "逛街", pill: "bg-indigo-100 text-indigo-800 ring-1 ring-indigo-200", dot: "bg-indigo-500" },
     };
 
     const INITIAL_SCHEDULE = {
@@ -175,35 +177,102 @@
         { id: "d1-1", time: "04:30", title: "凌晨到機場報到（預估 4–5 點）", category: "move", place: "桃園國際機場 T2", note: "提早到、換日幣/交通票券可一起處理。", map: "https://www.google.com/maps/search/?api=1&query=桃園國際機場第二航廈" },
         { id: "d1-2", time: "06:35–10:25", title: "✈️ 長榮 BR158 桃園二航 →小松機場", category: "move", place: "TPE → KMQ", note: "機上休息補眠。落地後找巴士售票機。", map: "https://www.google.com/maps/search/?api=1&query=Komatsu%20Airport" },
         { id: "d1-3", time: "10:40", title: "搭利木津巴士 → 金澤站西口（約 40 分）", category: "move", place: "小松機場 → 金澤站（西口）", note: "先找自動販賣機取車票。", map: "https://www.google.com/maps/search/?api=1&query=金澤站西口" },
-        { id: "d1-4", time: "12:00", title: "步行 5 分鐘 →金澤 FORUS 寄行李 & 逛街", category: "sight", place: "Kanazawa FORUS / 金澤車站", note: "中午～下午以車站周邊為主，補物資。", map: "https://www.google.com/maps/search/?api=1&query=Kanazawa%20Forus" },
-        { id: "d1-5", time: "18:30", title: "片町周邊：關東煮 + 晃晃", category: "food", place: "片町 Katamachi", note: "晚餐後散步消化，早點休息。", map: "https://www.google.com/maps/search/?api=1&query=片町%20金澤" },
+
+        // FORUS：改為逛街 + 更新備註（你提供的內容）
+        { id: "d1-4", time: "12:00", title: "步行 5 分鐘 → 金澤 FORUS 寄行李 & 逛街", category: "shop", place: "Kanazawa FORUS / 金澤車站", note:
+`FORUS
+nico and... 3F (營業時間10:00 - 19:00)
+Free-Spirits Kanazawa 4F (營業時間10:00 - 19:00)
+UQ、無印、寶可夢中心、ABC、LOFT 5F (營業時間10:00 - 19:00)
+星巴克 6F(營業時間11:00 - 20:00)`,
+          map: "https://www.google.com/maps/search/?api=1&query=Kanazawa%20Forus"
+        },
+
+        { id: "d1-5", time: "16:00–17:00", title: "飯店 Check in", category: "stay", place: "SOKI KANAZAWA", note: "把行李放好、稍微休息一下。", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
+        { id: "d1-6", time: "17:00–18:00", title: "mont bell 買買", category: "shop", place: "金澤", note: "營業時間 10:00 - 20:00", map: "https://www.google.com/maps/search/?api=1&query=mont-bell%20金沢" },
+        { id: "d1-7", time: "18:00–19:00", title: "晚餐、攤販小吃", category: "food", place: "金澤", note: "隨緣吃好吃的～", map: "https://www.google.com/maps/search/?api=1&query=金沢%20屋台%20グルメ" },
+        { id: "d1-8", time: "19:00–20:00", title: "神社參拜（尾山神社）", category: "sight", place: "尾山神社", note: "營業時間 00:00 - 21:00", map: "https://www.google.com/maps/search/?api=1&query=尾山神社" },
+        { id: "d1-9", time: "20:00–21:00", title: "片町：關東煮 + C-pla 金沢片町店 扭蛋", category: "shop", place: "片町 Katamachi", note: "C-pla 營業時間 10:00 - 21:00", map: "https://www.google.com/maps/search/?api=1&query=C-pla%20金沢片町店" },
+        { id: "d1-10", time: "21:00–22:00", title: "休息", category: "stay", place: "回飯店", note: "早點睡，隔天移動多。", map: "" },
       ],
+
       "2026-01-02": [
         { id: "d2-1", time: "06:00", title: "起床梳洗、便利商店補給", category: "food", place: "金澤", note: "出發前買水/早餐。", map: "https://www.google.com/maps/search/?api=1&query=金澤%20便利商店" },
         { id: "d2-2", time: "06:51–07:14", title: "🚄 新幹線 劍 Tsurugi 60：金澤 → 富山", category: "move", place: "金澤站 →富山站", note: "準時進站，留意月台。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
         { id: "d2-3", time: "07:58–09:28", title: "🚄 特急 飛驒 Hida 6（指定席）：富山→ 高山", category: "move", place: "富山站 →高山站", note: "車上可補眠/看行程。", map: "https://www.google.com/maps/search/?api=1&query=Takayama%20Station" },
-        { id: "d2-4", time: "10:00", title: "Starbucks 高山岡本店", category: "food", place: "高山", note: "拍照點，暖身。", map: "https://www.google.com/maps/search/?api=1&query=スターバックス%20高山岡本店" },
-        { id: "d2-5", time: "10:40", title: "舩坂酒造店", category: "sight", place: "高山", note: "小酌試飲注意步伐。", map: "https://www.google.com/maps/search/?api=1&query=舩坂酒造店" },
-        { id: "d2-6", time: "11:10", title: "miffy おやつ堂（飛驒高山店）", category: "food", place: "高山", note: "甜點補能量。", map: "https://www.google.com/maps/search/?api=1&query=miffy%20おやつ堂%20飛騨高山店" },
-        { id: "d2-7", time: "11:40", title: "高山布丁亭 / Pen Shop IMAI / 橋本煎餅堂", category: "sight", place: "高山老街", note: "沿路逛，彈性吃午餐。", map: "https://www.google.com/maps/search/?api=1&query=高山%20古い町並" },
-        { id: "d2-8", time: "15:17–16:44", title: "🚄 特急 飛驒 Hida 11：高山 → 富山", category: "move", place: "高山站 →富山站", note: "回程補眠。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
-        { id: "d2-9", time: "17:10", title: "🚄 新幹線（自由席）：富山 → 金澤", category: "move", place: "富山 →金澤", note: "現場買票；人多時提早排隊。", map: "https://www.google.com/maps/search/?api=1&query=金澤站" },
-        { id: "d2-10", time: "19:00", title: "晚餐 & 休息", category: "food", place: "金澤", note: "回飯店後整理戰利品。", map: "https://www.google.com/maps/search/?api=1&query=金澤%20餐廳" },
+
+        // 10:00–12:00（合併一個區塊，含你新增的清單）
+        { id: "d2-4", time: "10:00–12:00", title: "老街逛逛（咖啡/二手/物產/和菓子）", category: "shop", place: "高山老街", note:
+`星巴克 高山岡本店（限定木漆杯）(營業時間08:00 - 21:00)
+駿河屋 Asumo店 (營業時間10:00 - 18:00)
+飛驒物產館 (營業時間07:00 - 22:00)
+和菓子 ひよこ庵 (營業時間10:30 - 19:00)`,
+          map: "https://www.google.com/maps/search/?api=1&query=高山%20古い町並"
+        },
+
+        { id: "d2-5", time: "12:00–13:00", title: "午餐：老街小吃解決", category: "food", place: "高山老街", note: "ex 六拾番 / 看看咖哩（弱尊）/ 或看拉麵店有沒有開", map: "https://www.google.com/maps/search/?api=1&query=高山%20食べ歩き" },
+
+        // 13:00–14:00（合併一個區塊，含你新增的清單）
+        { id: "d2-6", time: "13:00–14:00", title: "再逛一輪：酒造/甜點/文具/煎餅/麵包", category: "shop", place: "高山老街", note:
+`舩坂酒造店（扭蛋酒廠）(營業時間08:30 - 18:00)
+みっふぃー おやつ堂 飛騨高山店（miffy）(營業時間09:30 - 17:00)
+高山布丁亭 (營業時間10:00 - 16:30)
+Pen Shop IMAI (營業時間10:00 - 18:00)
+橋本煎餅堂 (營業時間09:00 - 17:00)
+Komaya Pan (營業時間08:00 - 19:00)`,
+          map: "https://www.google.com/maps/search/?api=1&query=舩坂酒造店"
+        },
+
+        { id: "d2-7", time: "15:17–16:44", title: "🚄 特急 飛驒 Hida 11：高山 → 富山", category: "move", place: "高山站 →富山站", note: "回程補眠。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
+        { id: "d2-8", time: "17:10", title: "🚄 新幹線（自由席）：富山 → 金澤", category: "move", place: "富山 →金澤", note: "現場買票；人多時提早排隊。", map: "https://www.google.com/maps/search/?api=1&query=金澤站" },
+
+        { id: "d2-9", time: "18:00–19:00", title: "晚餐", category: "food", place: "金澤（或高山沒吃到就補）", note:
+`Go Go Curry ゴーゴーカレー (營業時間10:00 - 22:00)（如果沒在高山吃咖哩的話）
+長谷川亭 (營業時間11:30 - 22:00)`,
+          map: "https://www.google.com/maps/search/?api=1&query=金沢%20ゴーゴーカレー"
+        },
+        { id: "d2-10", time: "19:00–20:00", title: "到處晃晃", category: "sight", place: "金澤", note: "散步消化、看氣氛決定續攤或回飯店。", map: "https://www.google.com/maps/search/?api=1&query=金沢%20夜%20散歩" },
+        { id: "d2-11", time: "20:00–21:00", title: "休息", category: "stay", place: "回飯店", note: "整理戰利品、充電。", map: "" },
       ],
+
+      // DAY3：整天改為金澤路線（你提供的新版本）
       "2026-01-03": [
-        { id: "d3-1", time: "09:00–10:00", title: "早餐：東出珈琲店", category: "food", place: "金澤", note: "建議提早到避免排隊。", map: "https://www.google.com/maps/search/?api=1&query=東出珈琲店" },
-        { id: "d3-2", time: "10:30", title: "金澤 →富山（移動）", category: "move", place: "金澤→ 富山", note: "午前～中午移動。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
-        { id: "d3-3", time: "13:00", title: "富山市區活動（彈性安排）", category: "sight", place: "富山市區", note: "依天氣/體力微調。", map: "https://www.google.com/maps/search/?api=1&query=富山市" },
-        { id: "d3-4", time: "19:00", title: "晚餐 & 休息", category: "food", place: "富山/金澤（依住宿）", note: "早睡，隔天行程較滿。", map: "https://www.google.com/maps/search/?api=1&query=富山%20餐廳" },
+        { id: "d3-1", time: "07:00", title: "飯店早餐（7點準時吃飯！）", category: "food", place: "SOKI KANAZAWA", note: "吃飽一點，兼六園走路多。", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
+
+        { id: "d3-2", time: "08:00–10:00", title: "兼六園 & 金澤城", category: "sight", place: "兼六園／金澤城", note:
+`兼六園（營業時間 08:00 - 17:00）大人 320 日圓
+金澤城（營業時間 08:00 - 17:00）免費
+菱櫓/五十間長屋/橋爪門續櫓 大人 320 日圓
+可買：兼六園＋1 門票`,
+          map: "https://www.google.com/maps/search/?api=1&query=兼六園"
+        },
+
+        { id: "d3-3", time: "10:00–11:00", title: "SWAY COFFEE", category: "food", place: "金澤", note: "營業時間 08:30 - 18:00", map: "https://www.google.com/maps/search/?api=1&query=SWAY%20COFFEE%20金沢" },
+
+        { id: "d3-4", time: "11:00–12:00", title: "金澤21世紀美術館（游泳池！）", category: "sight", place: "金澤", note: "營業時間 09:00 - 18:00", map: "https://www.google.com/maps/search/?api=1&query=21st%20Century%20Museum%20of%20Contemporary%20Art%20Kanazawa" },
+
+        { id: "d3-5", time: "12:00–13:00", title: "午餐", category: "food", place: "金澤", note: "看當下人潮/想吃的決定。", map: "https://www.google.com/maps/search/?api=1&query=金沢%20ランチ" },
+
+        { id: "d3-6", time: "13:00–14:00", title: "Le Musée de H 金澤店（買伴手禮就好）", category: "food", place: "金澤", note: "營業時間 10:00 - 16:00（15:00 最後點餐）", map: "https://www.google.com/maps/search/?api=1&query=Le%20Mus%C3%A9e%20de%20H%20Kanazawa" },
+
+        { id: "d3-7", time: "14:00–15:00", title: "東茶屋街 / 金澤布丁 & 冰淇淋", category: "sight", place: "東茶屋街", note: "（你原文時間：營業時間 10:00 - 16:00）", map: "https://www.google.com/maps/search/?api=1&query=東茶屋街%20金澤" },
+
+        { id: "d3-8", time: "16:00–17:00", title: "Kajimart Kanazawa M’ZA Store 超市採購 → 回飯店放", category: "shop", place: "金澤", note: "採購零食、飲料、隔天路上食物。", map: "https://www.google.com/maps/search/?api=1&query=Kajimart%20Kanazawa%20M’ZA" },
       ],
+
+      // DAY4：改成早餐 + 金澤→富山交通（你提供的新版本）
       "2026-01-04": [
-        { id: "d4-1", time: "10:00", title: "金澤 21 世紀美術館", category: "sight", place: "金澤", note: "熱門展區可先查票務/開館。", map: "https://www.google.com/maps/search/?api=1&query=21st%20Century%20Museum%20of%20Contemporary%20Art%20Kanazawa" },
-        { id: "d4-2", time: "12:00", title: "Le Musée de H", category: "food", place: "金澤", note: "甜點/咖啡。", map: "https://www.google.com/maps/search/?api=1&query=Le%20Mus%C3%A9e%20de%20H%20Kanazawa" },
-        { id: "d4-3", time: "13:30", title: "東茶屋街（散步逛街）", category: "sight", place: "金澤", note: "拍照路線順走。", map: "https://www.google.com/maps/search/?api=1&query=東茶屋街%20金澤" },
-        { id: "d4-4", time: "15:30", title: "兼六園 & 金澤城", category: "sight", place: "金澤", note: "黃昏時段光線漂亮。", map: "https://www.google.com/maps/search/?api=1&query=兼六園" },
-        { id: "d4-5", time: "17:30", title: "Kajimart 超市採購 →回飯店放東西", category: "move", place: "金澤", note: "補零食/飲料/隔天路上食物。", map: "https://www.google.com/maps/search/?api=1&query=Kajimart%20金澤" },
-        { id: "d4-6", time: "19:30", title: "神社參拜 & 片町周邊晃", category: "sight", place: "金澤", note: "放鬆收尾。", map: "https://www.google.com/maps/search/?api=1&query=金澤%20神社" },
+        { id: "d4-1", time: "08:00–09:00", title: "早餐：東出珈琲店", category: "food", place: "金澤", note: "營業時間 09:00 - 18:00", map: "https://www.google.com/maps/search/?api=1&query=東出珈琲店" },
+
+        { id: "d4-2", time: "09:00–10:00", title: "金澤 → 富山（交通擇一）", category: "move", place: "金澤站 → 富山站", note:
+`1) 北陸新幹線 2,860 円（41 分）
+2) IR石川鐵道 1,290 円（63 分）`,
+          map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station"
+        },
+
+        { id: "d4-3", time: "10:30–", title: "富山市區行程（彈性安排）", category: "sight", place: "富山市區", note: "依天氣/體力微調，想逛街也可以把這段當作逛街時間。", map: "https://www.google.com/maps/search/?api=1&query=富山市" },
       ],
+
       "2026-01-05": [
         { id: "d5-1", time: "08:00", title: "清晨整理行李、準備出門", category: "stay", place: "金澤", note: "退房、檢查充電器/護照。", map: "" },
         { id: "d5-2", time: "09:30", title: "金澤 →小松機場（巴士）", category: "move", place: "金澤站→ 小松機場", note: "預留候車與排隊時間。", map: "https://www.google.com/maps/search/?api=1&query=Komatsu%20Airport" },
@@ -573,7 +642,7 @@
                 </div>
                 <Card className="p-3">
                   <div className="text-xs text-sand-500">備註</div>
-                  <div className="mt-2 w-full rounded-2xl bg-white px-3 py-3 text-sm leading-relaxed ring-1 ring-sand-100 text-sand-800">
+                  <div className="mt-2 w-full rounded-2xl bg-white px-3 py-3 text-sm leading-relaxed ring-1 ring-sand-100 text-sand-800 whitespace-pre-line">
                     {selectedItem.note || "暫無備註"}
                   </div>
                 </Card>
@@ -772,30 +841,25 @@
         setForm((f) => ({ ...f, allocations: { ...f.allocations, [name]: value.replace(/[^\d]/g, "") } }));
       };
 
- const splitEven = () => {
+      const splitEven = () => {
         const total = Number(form.total || 0);
         if (!total || total <= 0) return alert("請先輸入總金額（> 0）");
 
-        const base = Math.floor(total / PEOPLE.length); 
-        const rem = total - base * PEOPLE.length; 
+        const base = Math.floor(total / PEOPLE.length);
+        const rem = total - base * PEOPLE.length;
 
         const payer = form.payer;
-        const others = PEOPLE.filter((p) => p !== payer); 
+        const others = PEOPLE.filter((p) => p !== payer);
 
-        // 1. 初始化分配，大家都先拿底數
         const alloc = Object.fromEntries(PEOPLE.map((p) => [p, base]));
 
         if (rem > 0) {
-          // 2. 公平隨機：將非代墊人名單隨機排序
           const shuffledOthers = [...others].sort(() => Math.random() - 0.5);
-          
-          // 3. 將餘數分給排序靠前的人
           for (let k = 0; k < rem; k++) {
             alloc[shuffledOthers[k]] += 1;
           }
         }
 
-        // 4. 強制更新狀態：確保 React 感知到變化
         setForm({
           ...form,
           allocations: Object.fromEntries(PEOPLE.map((p) => [p, String(alloc[p])]))
@@ -866,6 +930,7 @@
               </div>
             </div>
           </Card>
+
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -874,6 +939,7 @@
               </div>
               <div className="text-xs text-sand-500">¥ JPY</div>
             </div>
+
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div className="col-span-2">
                 <label className="text-xs text-sand-500">日期</label>
@@ -881,20 +947,24 @@
                   {TRIP_DAYS.map((d) => <option key={d.key} value={d.key}>{d.label}</option>)}
                 </select>
               </div>
+
               <div className="col-span-2">
                 <label className="text-xs text-sand-500">項目</label>
                 <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="例如：午餐、車票、無印、門票…" className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100" />
               </div>
+
               <div>
                 <label className="text-xs text-sand-500">付款人</label>
                 <select value={form.payer} onChange={(e) => setForm((f) => ({ ...f, payer: e.target.value }))} className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100">
                   {PEOPLE.map((p) => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
+
               <div>
                 <label className="text-xs text-sand-500">總金額（¥）</label>
                 <input value={form.total} onChange={(e) => setForm((f) => ({ ...f, total: e.target.value.replace(/[^\d]/g, "") }))} inputMode="numeric" placeholder="數字" className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100" />
               </div>
+
               <div className="col-span-2">
                 <div className="flex items-center justify-between">
                   <label className="text-xs text-sand-500">分配</label>
@@ -912,12 +982,14 @@
                   ))}
                 </div>
               </div>
+
               <div className="mt-3 grid grid-cols-2 gap-2 col-span-2">
                 <button onClick={splitEven} className="w-full rounded-2xl bg-white px-4 py-3 text-sm font-semibold shadow-soft ring-1 ring-sand-100 hover:bg-sand-50">一鍵平分</button>
                 <button onClick={addEntry} className="w-full rounded-2xl bg-moss-600 px-4 py-3 text-sm font-semibold text-white shadow-soft hover:bg-moss-700">新增到列表</button>
               </div>
             </div>
           </Card>
+
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-sand-600">明細</div>
@@ -925,6 +997,7 @@
             </div>
             <div className="text-xs text-sand-500">{entries.length} 筆</div>
           </div>
+
           {[...grouped.keys()].sort().map((dayKey) => {
             const day = TRIP_DAYS.find((d) => d.key === dayKey)?.label ?? dayKey;
             const arr = grouped.get(dayKey);
