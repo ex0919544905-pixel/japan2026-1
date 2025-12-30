@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#3F5B3B" />
-
+  
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-
+  
   <meta name="apple-mobile-web-app-title" content="2026日本北陸" />
   <title>2026日本北陸旅行</title>
 
@@ -70,33 +70,22 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
+  
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
-    .safe-b {
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    .safe-b { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+    .safe-t { padding-top: max(16px, env(safe-area-inset-top)); }
+    .grain::before{
+      content:"";
+      position:absolute; inset:0;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="https://www.w3.org/2000/svg" width="120" height="120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity=".06"/></svg>');
+      pointer-events:none; mix-blend-mode:multiply;
     }
-    .safe-t {
-      padding-top: max(16px, env(safe-area-inset-top));
-    }
-    .grain::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="https://www.w3.org/2000/svg" width="120" height="120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" stitchTiles="stitch"/></filter><rect width="120" height="120" filter="url(%23n)" opacity=".06"/></svg>');
-      pointer-events: none;
-      mix-blend-mode: multiply;
-    }
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+    .no-scrollbar::-webkit-scrollbar { display:none; }
+    .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
   </style>
 </head>
 
@@ -117,9 +106,7 @@
       appId: "1:955400726204:web:56c4d76cfe1800c42212b9"
     };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const expenseRef = db.ref("shared_expenses");
 
@@ -135,14 +122,10 @@
         const raw = localStorage.getItem(key);
         if (!raw) return fallback;
         return JSON.parse(raw);
-      } catch {
-        return fallback;
-      }
+      } catch { return fallback; }
     }
     function saveJSON(key, value) {
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-      } catch {}
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
     }
 
     // ---------- Trip Days ----------
@@ -163,120 +146,284 @@
       "2026-01-05": { name: "小松", lat: 36.3946, lon: 136.4066 },
     };
 
-    // 新增：逛街
+    // ---------- Tags / Categories ----------
     const CATEGORY = {
       sight: { label: "景點", pill: "bg-moss-100 text-moss-800 ring-1 ring-moss-200", dot: "bg-moss-500" },
       food:  { label: "美食", pill: "bg-clay-100 text-clay-800 ring-1 ring-clay-200", dot: "bg-clay-500" },
       move:  { label: "交通", pill: "bg-sand-100 text-sand-800 ring-1 ring-sand-200", dot: "bg-sand-500" },
       stay:  { label: "住宿", pill: "bg-slate-100 text-slate-700 ring-1 ring-slate-200", dot: "bg-slate-500" },
-      shop:  { label: "逛街", pill: "bg-indigo-100 text-indigo-800 ring-1 ring-indigo-200", dot: "bg-indigo-500" },
+      shop:  { label: "逛街", pill: "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200", dot: "bg-indigo-500" },
     };
 
+    // ---------- Schedule ----------
     const INITIAL_SCHEDULE = {
       "2026-01-01": [
-        { id: "d1-1", time: "04:30", title: "凌晨到機場報到（預估 4–5 點）", category: "move", place: "桃園國際機場 T2", note: "提早到、填寫線上入境申請。", map: "https://www.google.com/maps/search/?api=1&query=桃園國際機場第二航廈" },
-        { id: "d1-2", time: "06:35–10:25", title: "✈️ 長榮 BR158 桃園二航 →小松機場", category: "move", place: "TPE → KMQ", note: "機上休息補眠。落地後找巴士售票機。", map: "https://www.google.com/maps/search/?api=1&query=Komatsu%20Airport" },
+        { id: "d1-1", time: "04:30", title: "凌晨到機場報到（預估 4–5 點）", category: "move", place: "桃園國際機場 T2", note: "提早到、準備出發。", map: "https://www.google.com/maps/search/?api=1&query=桃園國際機場第二航廈" },
+        { id: "d1-2", time: "06:35–10:25", title: "✈️ 長榮 BR158 桃園二航 → 小松機場", category: "move", place: "TPE → KMQ", note: "機上休息補眠。落地後找巴士售票機。", map: "https://www.google.com/maps/search/?api=1&query=Komatsu%20Airport" },
         { id: "d1-3", time: "10:40", title: "搭利木津巴士 → 金澤站西口（約 40 分）", category: "move", place: "小松機場 → 金澤站（西口）", note: "先找自動販賣機取車票。「取票」到富山預定編號483322、到高山預定編號41160、回富山預定編號45613", map: "https://www.google.com/maps/search/?api=1&query=金澤站西口" },
-
-        // FORUS：改為逛街 + 更新備註（你提供的內容）
-        { id: "d1-4", time: "12:00", title: "步行 5 分鐘 → 金澤 FORUS 寄行李 & 逛街", category: "shop", place: "Kanazawa FORUS / 金澤車站", note:
+        {
+          id: "d1-4", time: "12:00–16:00", title: "金澤 FORUS 寄行李 & 逛街", category: "shop", place: "Kanazawa FORUS / 金澤車站",
+          note:
 `FORUS
-nico and... 3F (營業時間10:00 - 19:00)
-Free-Spirits Kanazawa 4F (營業時間10:00 - 19:00)
-UQ、無印、寶可夢中心、ABC、LOFT 5F (營業時間10:00 - 19:00)
-星巴克 6F(營業時間11:00 - 20:00)`,
+nico and... 3F（營業時間 10:00 - 19:00）
+Free-Spirits Kanazawa 4F（營業時間 10:00 - 19:00）
+UQ、無印、寶可夢中心、ABC、LOFT 5F（營業時間 10:00 - 19:00）
+星巴克 6F（營業時間 11:00 - 20:00）`,
           map: "https://www.google.com/maps/search/?api=1&query=Kanazawa%20Forus"
         },
-
-        { id: "d1-5", time: "16:00–17:00", title: "飯店 Check in", category: "stay", place: "SOKI KANAZAWA", note: "把行李放好、稍微休息一下。", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
-        { id: "d1-6", time: "17:00–18:00", title: "mont bell 買買", category: "shop", place: "金澤", note: "營業時間 10:00 - 20:00", map: "https://www.google.com/maps/search/?api=1&query=mont-bell%20金沢" },
-        { id: "d1-7", time: "18:00–19:00", title: "晚餐、攤販小吃", category: "food", place: "金澤", note: "隨緣吃好吃的～", map: "https://www.google.com/maps/search/?api=1&query=金沢%20屋台%20グルメ" },
-        { id: "d1-8", time: "19:00–20:00", title: "神社參拜（尾山神社）", category: "sight", place: "尾山神社", note: "營業時間 00:00 - 21:00", map: "https://www.google.com/maps/search/?api=1&query=尾山神社" },
-        { id: "d1-9", time: "20:00–21:00", title: "片町：關東煮 + C-pla 金沢片町店 扭蛋", category: "shop", place: "片町 Katamachi", note: "C-pla 營業時間 10:00 - 21:00", map: "https://www.google.com/maps/search/?api=1&query=C-pla%20金沢片町店" },
-        { id: "d1-10", time: "21:00–22:00", title: "休息", category: "stay", place: "回飯店", note: "早點睡，隔天移動多。", map: "" },
+        { id: "d1-5", time: "16:00–17:00", title: "飯店 Check-in", category: "stay", place: "SOKI KANAZAWA", note: "放行李、補水、充電。", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
+        { id: "d1-6", time: "17:00–18:00", title: "Montbell 買買", category: "shop", place: "金澤站周邊", note: "營業時間 10:00 - 20:00", map: "https://www.google.com/maps/search/?api=1&query=mont-bell%20金沢" },
+        { id: "d1-7", time: "18:00–19:00", title: "晚餐、攤販小吃", category: "food", place: "金澤市區", note: "先吃點熱的，補體力。", map: "https://www.google.com/maps/search/?api=1&query=金澤%20屋台%20小吃" },
+        { id: "d1-8", time: "19:00–20:00", title: "神社參拜：尾山神社", category: "sight", place: "尾山神社", note: "營業時間 00:00 - 21:00", map: "https://www.google.com/maps/search/?api=1&query=尾山神社" },
+        { id: "d1-9", time: "20:00–21:00", title: "片町散步＋關東煮＋C-pla 金沢片町店扭蛋", category: "shop", place: "片町 Katamachi", note: "C-pla 營業時間 10:00 - 21:00", map: "https://www.google.com/maps/search/?api=1&query=C-pla%20金沢片町店" },
+        { id: "d1-10", time: "21:00–22:00", title: "回飯店休息", category: "stay", place: "SOKI KANAZAWA", note: "早點睡，明天移動多。", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
       ],
 
       "2026-01-02": [
         { id: "d2-1", time: "06:00", title: "起床梳洗、便利商店補給", category: "food", place: "金澤", note: "出發前買水/早餐。", map: "https://www.google.com/maps/search/?api=1&query=金澤%20便利商店" },
-        { id: "d2-2", time: "06:51–07:14", title: "🚄 新幹線 劍 Tsurugi 60：金澤 → 富山", category: "move", place: "金澤站 →富山站", note: "準時進站，留意月台。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
-        { id: "d2-3", time: "07:58–09:28", title: "🚄 特急 飛驒 Hida 6（指定席）：富山→ 高山", category: "move", place: "富山站 →高山站", note: "車上可補眠/看行程。", map: "https://www.google.com/maps/search/?api=1&query=Takayama%20Station" },
+        { id: "d2-2", time: "06:51–07:14", title: "🚄 新幹線 劍 Tsurugi 60：金澤 → 富山", category: "move", place: "金澤站 → 富山站", note: "準時進站，留意月台。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
+        { id: "d2-3", time: "07:58–09:28", title: "🚄 特急 飛驒 Hida 6（指定席）：富山 → 高山", category: "move", place: "富山站 → 高山站", note: "車上可補眠/看行程。", map: "https://www.google.com/maps/search/?api=1&query=Takayama%20Station" },
 
-        // 10:00–12:00（合併一個區塊，含你新增的清單）
-        { id: "d2-4", time: "10:00–12:00", title: "老街逛逛（咖啡/二手/物產/和菓子）", category: "shop", place: "高山老街", note:
-`星巴克 高山岡本店（限定木漆杯）(營業時間08:00 - 21:00)
-駿河屋 Asumo店 (營業時間10:00 - 18:00)
-飛驒物產館 (營業時間07:00 - 22:00)
-和菓子 ひよこ庵 (營業時間10:30 - 19:00)`,
+        {
+          id: "d2-4",
+          time: "10:00–12:00",
+          title: "高山老街散策（咖啡/伴手禮/雜貨）",
+          category: "sight",
+          place: "高山",
+          note:
+`星巴克 高山岡本店（限定木漆杯）（營業時間 08:00 - 21:00）
+駿河屋 Asumo店（營業時間 10:00 - 18:00）
+飛驒物產館（營業時間 07:00 - 22:00）
+和菓子 ひよこ庵（營業時間 10:30 - 19:00）`,
           map: "https://www.google.com/maps/search/?api=1&query=高山%20古い町並"
         },
 
-        { id: "d2-5", time: "12:00–13:00", title: "午餐：老街小吃解決", category: "food", place: "高山老街", note: "ex 六拾番 / 看看咖哩（弱尊）/ 或看拉麵店有沒有開", map: "https://www.google.com/maps/search/?api=1&query=高山%20食べ歩き" },
+        { id: "d2-5", time: "12:00–13:00", title: "午餐：老街小吃解決（彈性）", category: "food", place: "高山老街", note: "ex：六拾番 / 看看咖哩（弱尊）/ 拉麵店（看有沒有開）。", map: "https://www.google.com/maps/search/?api=1&query=高山%20食べ歩き" },
 
-        // 13:00–14:00（合併一個區塊，含你新增的清單）
-        { id: "d2-6", time: "13:00–14:00", title: "再逛一輪：酒造/甜點/文具/煎餅/麵包", category: "shop", place: "高山老街", note:
-`舩坂酒造店（扭蛋酒廠）(營業時間08:30 - 18:00)
-みっふぃー おやつ堂 飛騨高山店（miffy）(營業時間09:30 - 17:00)
-高山布丁亭 (營業時間10:00 - 16:30)
-Pen Shop IMAI (營業時間10:00 - 18:00)
-橋本煎餅堂 (營業時間09:00 - 17:00)
-Komaya Pan (營業時間08:00 - 19:00)`,
-          map: "https://www.google.com/maps/search/?api=1&query=舩坂酒造店"
+        {
+          id: "d2-6",
+          time: "13:00–14:00",
+          title: "高山逛逛（酒造/甜點/文具/煎餅/麵包）",
+          category: "shop",
+          place: "高山",
+          note:
+`舩坂酒造店（扭蛋酒廠）（營業時間 08:30 - 18:00）
+みっふぃー おやつ堂飛騨高山店（miffy）（營業時間 09:30 - 17:00）
+高山布丁亭（營業時間 10:00 - 16:30）
+Pen Shop IMAI（營業時間 10:00 - 18:00）
+橋本煎餅堂（營業時間 09:00 - 17:00）
+Komaya Pan（營業時間 08:00 - 19:00）`,
+          map: "https://www.google.com/maps/search/?api=1&query=舩坂酒造店%20高山"
         },
 
-        { id: "d2-7", time: "15:17–16:44", title: "🚄 特急 飛驒 Hida 11：高山 → 富山", category: "move", place: "高山站 →富山站", note: "回程補眠。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
-        { id: "d2-8", time: "17:10", title: "🚄 新幹線（自由席）：富山 → 金澤", category: "move", place: "富山 →金澤", note: "現場買票；人多時提早排隊。", map: "https://www.google.com/maps/search/?api=1&query=金澤站" },
+        { id: "d2-7", time: "15:17–16:44", title: "🚄 特急 飛驒 Hida 11：高山 → 富山", category: "move", place: "高山站 → 富山站", note: "回程補眠。", map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station" },
+        { id: "d2-8", time: "17:10", title: "🚄 新幹線（自由席）：富山 → 金澤", category: "move", place: "富山 → 金澤", note: "現場買票；人多時提早排隊。", map: "https://www.google.com/maps/search/?api=1&query=金澤站" },
 
-        { id: "d2-9", time: "18:00–19:00", title: "晚餐", category: "food", place: "金澤（或高山沒吃到就補）", note:
-`Go Go Curry ゴーゴーカレー (營業時間10:00 - 22:00)（如果沒在高山吃咖哩的話）
-長谷川亭 (營業時間11:30 - 22:00)`,
-          map: "https://www.google.com/maps/search/?api=1&query=金沢%20ゴーゴーカレー"
+        {
+          id: "d2-9",
+          time: "19:00–20:00",
+          title: "晚餐：金澤站麥當勞 / 沒吃到的就補一間",
+          category: "food",
+          place: "McDonald's マクドナルド 金沢駅店",
+          note: "營業時間 07:00 - 22:00；或「哪間沒去吃就去吃哪間(?)」",
+          map: "https://www.google.com/maps/search/?api=1&query=McDonald%27s%20金沢駅店"
         },
-        { id: "d2-10", time: "19:00–20:00", title: "到處晃晃", category: "sight", place: "金澤", note: "散步消化、看氣氛決定續攤或回飯店。", map: "https://www.google.com/maps/search/?api=1&query=金沢%20夜%20散歩" },
-        { id: "d2-11", time: "20:00–21:00", title: "休息", category: "stay", place: "回飯店", note: "整理戰利品、充電。", map: "" },
+        { id: "d2-10", time: "20:00–21:00", title: "回飯店整理 & 休息", category: "stay", place: "SOKI KANAZAWA", note: "戰利品整理、充電、泡湯（如果要）。", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
       ],
 
-      // DAY3：整天改為金澤路線（你提供的新版本）
       "2026-01-03": [
-        { id: "d3-1", time: "07:00", title: "飯店早餐（7點準時吃飯！）", category: "food", place: "SOKI KANAZAWA", note: "吃飽一點，兼六園走路多。", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
+        { id: "d3-0", time: "07:00", title: "飯店早餐（7點準時吃飯！）", category: "food", place: "SOKI KANAZAWA", note: "吃飽出發！", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
 
-        { id: "d3-2", time: "08:00–10:00", title: "兼六園 & 金澤城", category: "sight", place: "兼六園／金澤城", note:
-`兼六園（營業時間 08:00 - 17:00）大人 320 日圓
+        {
+          id: "d3-1",
+          time: "08:00–10:00",
+          title: "兼六園 & 金澤城（含菱櫓/五十間長屋/橋爪門續櫓）",
+          category: "sight",
+          place: "兼六園 / 金澤城公園",
+          note:
+`兼六園（營業時間 08:00 - 17:00）大人 320 円
 金澤城（營業時間 08:00 - 17:00）免費
-菱櫓/五十間長屋/橋爪門續櫓 大人 320 日圓
-可買：兼六園＋1 門票`,
+菱櫓/五十間長屋/橋爪門續櫓：大人 320 円（兼六園＋1 門票）`,
           map: "https://www.google.com/maps/search/?api=1&query=兼六園"
         },
 
-        { id: "d3-3", time: "10:00–11:00", title: "SWAY COFFEE", category: "food", place: "金澤", note: "營業時間 08:30 - 18:00", map: "https://www.google.com/maps/search/?api=1&query=SWAY%20COFFEE%20金沢" },
+        { id: "d3-2", time: "10:00–11:00", title: "SWAY COFFEE", category: "food", place: "金澤", note: "營業時間 08:30 - 18:00", map: "https://www.google.com/maps/search/?api=1&query=SWAY%20COFFEE%20Kanazawa" },
 
-        { id: "d3-4", time: "11:00–12:00", title: "金澤21世紀美術館（游泳池！）", category: "sight", place: "金澤", note: "營業時間 09:00 - 18:00", map: "https://www.google.com/maps/search/?api=1&query=21st%20Century%20Museum%20of%20Contemporary%20Art%20Kanazawa" },
+        {
+          id: "d3-3",
+          time: "11:00–12:00",
+          title: "金澤21世紀美術館（游泳池！）",
+          category: "sight",
+          place: "21st Century Museum of Contemporary Art, Kanazawa",
+          note: "營業時間 09:00 - 18:00；子瑄已購票～前一天再把 QR code 給大家；門票：¥1000/人。",
+          map: "https://www.google.com/maps/search/?api=1&query=21st%20Century%20Museum%20of%20Contemporary%20Art%20Kanazawa"
+        },
 
-        { id: "d3-5", time: "12:00–13:00", title: "午餐", category: "food", place: "金澤", note: "看當下人潮/想吃的決定。", map: "https://www.google.com/maps/search/?api=1&query=金沢%20ランチ" },
+        {
+          id: "d3-4",
+          time: "12:00–13:00",
+          title: "Le Musée de H 金澤店（買伴手禮/甜點）",
+          category: "food",
+          place: "Le Musée de H Kanazawa",
+          note: "營業時間 10:00 - 16:00（15:00 最後點餐）覺得可以去買個伴手禮就行(?)",
+          map: "https://www.google.com/maps/search/?api=1&query=Le%20Mus%C3%A9e%20de%20H%20Kanazawa"
+        },
 
-        { id: "d3-6", time: "13:00–14:00", title: "Le Musée de H 金澤店（買伴手禮就好）", category: "food", place: "金澤", note: "營業時間 10:00 - 16:00（15:00 最後點餐）", map: "https://www.google.com/maps/search/?api=1&query=Le%20Mus%C3%A9e%20de%20H%20Kanazawa" },
+        {
+          id: "d3-5",
+          time: "13:00–14:00",
+          title: "午餐（2選1）＋路過逛",
+          category: "food",
+          place: "市區",
+          note:
+`Grill Otsuka（營業時間 11:00 - 15:20／14:45 L.O.）
+or
+Hirami Pan ひらみぱん（營業時間 08:00 - 18:00）
+BEAMS 金澤店（會路過，逛逛？）（營業時間 11:00 - 20:00）`,
+          map: "https://www.google.com/maps/search/?api=1&query=Grill%20Otsuka%20Kanazawa"
+        },
 
-        { id: "d3-7", time: "14:00–15:00", title: "東茶屋街 / 金澤布丁 & 冰淇淋", category: "sight", place: "東茶屋街", note: "（營業時間 10:00 - 16:00）", map: "https://www.google.com/maps/search/?api=1&query=東茶屋街%20金澤" },
+        {
+          id: "d3-6",
+          time: "14:00–16:00",
+          title: "東茶屋街 & 主計町茶屋街（走走逛逛）",
+          category: "sight",
+          place: "ひがし茶屋街 / 主計町茶屋街",
+          note:
+`東茶屋街（暗がり坂）＆主計町茶屋街 走走逛逛
+金澤布丁 & 冰淇淋（營業時間 10:00 - 16:00）
+加賀麩不室屋 東山店（營業時間 10:00 - 17:30）
+ひがし茶屋街 懐華樓（營業時間 10:00 - 17:00）
+一笑（丸八製茶場-加賀棒茶）（營業時間 12:00 - 17:00（L.O. 16:30）官網跟 IG 訊息不一樣）`,
+          map: "https://www.google.com/maps/search/?api=1&query=ひがし茶屋街"
+        },
 
-        { id: "d3-8", time: "16:00–17:00", title: "Kajimart Kanazawa M’ZA Store 超市採購 → 回飯店放", category: "shop", place: "金澤", note: "採購零食、飲料、隔天路上食物。", map: "https://www.google.com/maps/search/?api=1&query=Kajimart%20Kanazawa%20M’ZA" },
+        {
+          id: "d3-7",
+          time: "16:00–18:00",
+          title: "M’ZA 超市/藥妝採購 → 回飯店放",
+          category: "shop",
+          place: "Kanazawa M’ZA / 近江町周邊",
+          note:
+`Kajimart Kanazawa M’ZA Store（營業時間 10:00 - 19:30）
+Urata Kanazawa M’ZA Store（紅色小人點心）
+／
+薬 マツモトキヨシ 近江町店（營業時間 09:00 - 20:00）（1/1-1/2 沒開）`,
+          map: "https://www.google.com/maps/search/?api=1&query=Kanazawa%20M%27ZA"
+        },
+
+        { id: "d3-8", time: "18:00–19:00", title: "晚餐：武右衛門 / BUEMON（或另找）", category: "food", place: "金澤", note: "營業時間 11:30 - 20:00（如果有開）or 另找。", map: "https://www.google.com/maps/search/?api=1&query=武右衛門%20金沢" },
+        { id: "d3-9", time: "19:00–20:00", title: "到處晃晃（散步消化）", category: "sight", place: "金澤市區", note: "看心情逛。", map: "https://www.google.com/maps/search/?api=1&query=金沢%20夜景" },
+        { id: "d3-10", time: "20:00–21:00", title: "回飯店休息", category: "stay", place: "SOKI KANAZAWA", note: "整理採購、充電。", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
       ],
 
-      // DAY4：改成早餐 + 金澤→富山交通（你提供的新版本）
       "2026-01-04": [
-        { id: "d4-1", time: "08:00–09:00", title: "早餐：東出珈琲店", category: "food", place: "金澤", note: "營業時間 09:00 - 18:00", map: "https://www.google.com/maps/search/?api=1&query=東出珈琲店" },
+        { id: "d4-1", time: "09:00–10:00", title: "早餐：東出珈琲店", category: "food", place: "東出珈琲店", note: "營業時間 09:00 - 18:00", map: "https://www.google.com/maps/search/?api=1&query=東出珈琲店" },
 
-        { id: "d4-2", time: "09:00–10:00", title: "金澤 → 富山（交通擇一）", category: "move", place: "金澤站 → 富山站", note:
-`1) 北陸新幹線 2,860 円（41 分）
-2) IR石川鐵道 1,290 円（63 分）`,
+        {
+          id: "d4-2",
+          time: "10:00–11:00",
+          title: "金澤 → 富山（新幹線）＋車站買點心",
+          category: "move",
+          place: "金澤站 → 富山站",
+          note:
+`新幹線（2選1）：
+10:17 - 10:36 Kagayaki 526
+or
+10:45 - 11:07 Tsurugi 8
+
+到站/路過可買：
+放生若狭屋 とやマルシェ店（營業時間 09:00 - 19:00）
+七越 きときと市場 とやマルシェ店（七越燒）（營業時間 09:00 - 20:30）`,
           map: "https://www.google.com/maps/search/?api=1&query=Toyama%20Station"
         },
 
-        { id: "d4-3", time: "10:30–", title: "富山市區行程（彈性安排）", category: "sight", place: "富山市區", note: "依天氣/體力微調，想逛街也可以把這段當作逛街時間。", map: "https://www.google.com/maps/search/?api=1&query=富山市" },
+        {
+          id: "d4-3",
+          time: "11:00–12:00",
+          title: "午餐：天婦羅 富山白蝦亭（白えび亭）",
+          category: "food",
+          place: "とやマルシェ",
+          note: "營業時間 11:00 - 20:00",
+          map: "https://www.google.com/maps/search/?api=1&query=白えび亭%20とやマルシェ"
+        },
+
+        {
+          id: "d4-4",
+          time: "12:00–15:00",
+          title: "環水公園（星巴克/天門橋觀景台/安兵衛）",
+          category: "sight",
+          place: "富岩運河環水公園",
+          note:
+`星巴克 富山環水公園店（營業時間 08:00 - 22:30）
+天門橋觀景台
+池田屋安兵衛商店（營業時間 09:00 - 18:00）
+ps 天氣好的話：西町交差点可拍路面電車 + 山的合照
+（這 3 小時要掌握好）`,
+          map: "https://www.google.com/maps/search/?api=1&query=スターバックス%20富山環水公園店"
+        },
+
+        {
+          id: "d4-5",
+          time: "15:00–16:00",
+          title: "富山 → 金澤（新幹線）",
+          category: "move",
+          place: "富山站 → 金澤站",
+          note:
+`新幹線（2選1）：
+15:04 - 15:23 Kagayaki 529
+or
+15:40 - 16:03 Tsurugi 33`,
+          map: "https://www.google.com/maps/search/?api=1&query=Kanazawa%20Station"
+        },
+
+        {
+          id: "d4-6",
+          time: "16:00–18:00",
+          title: "金澤車站 逛逛買買（到 8 點左右）",
+          category: "shop",
+          place: "金澤站 / 金澤百番街",
+          note:
+`3COINS+plus / AUX PARADIS / URBAN RESEARCH... etc
+金澤百番街隨意逛
+ささら屋（仙貝）08:30 - 20:00
+... etc`,
+          map: "https://www.google.com/maps/search/?api=1&query=金沢百番街"
+        },
+
+        {
+          id: "d4-7",
+          time: "18:00–19:00",
+          title: "晚餐（彈性）",
+          category: "food",
+          place: "金澤",
+          note:
+`Go Go Curry ゴーゴーカレー（營業時間 10:00 - 22:00）（如果沒在高山吃咖哩的話）
+or 長谷川亭（營業時間 11:30 - 22:00）
+or 有其他想法可以再討論`,
+          map: "https://www.google.com/maps/search/?api=1&query=ゴーゴーカレー%20金沢"
+        },
+
+        { id: "d4-8", time: "19:00–20:00", title: "到處晃晃", category: "sight", place: "金澤市區", note: "散步、享受小地方的夜景。", map: "https://www.google.com/maps/search/?api=1&query=金沢%20夜" },
+        { id: "d4-9", time: "20:00–21:00", title: "休息", category: "stay", place: "SOKI KANAZAWA", note: "明天要回家～", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
       ],
 
       "2026-01-05": [
-        { id: "d5-1", time: "08:00", title: "清晨整理行李、準備出門", category: "stay", place: "金澤", note: "退房、檢查充電器/護照。", map: "" },
-        { id: "d5-2", time: "09:30", title: "金澤 →小松機場（巴士）", category: "move", place: "金澤站→ 小松機場", note: "預留候車與排隊時間。", map: "https://www.google.com/maps/search/?api=1&query=Komatsu%20Airport" },
-        { id: "d5-3", time: "11:45–14:35", title: "✈️ 長榮 BR157 小松 → 桃園二航", category: "move", place: "KMQ → TPE", note: "平安回家～", map: "https://www.google.com/maps/search/?api=1&query=桃園國際機場第二航廈" },
+        { id: "d5-1", time: "08:00–09:00", title: "飯店 Check-out", category: "stay", place: "SOKI KANAZAWA", note: "確認護照/充電器/伴手禮。", map: "https://maps.app.goo.gl/AiNn6tNwGVsXf5JUA" },
+        {
+          id: "d5-2",
+          time: "08:55–09:40",
+          title: "金澤 → 小松機場（巴士）",
+          category: "move",
+          place: "金澤站西口 3 號月台 → 小松空港",
+          note:
+`小松空港巴士（無現金營運）
+08:55 金澤站西口 3 號月台
+09:40 到小松機場
+or 問飯店櫃檯（因應天氣狀況）`,
+          map: "https://www.google.com/maps/search/?api=1&query=金澤站西口%203號月台"
+        },
+        { id: "d5-3", time: "11:45–14:35", title: "✈️ 長榮 BR157 小松 → 桃園二航", category: "move", place: "KMQ → TPE", note: "平安回家～", map: "https://www.google.com/maps/search/?api=1&query=Komatsu%20Airport" },
       ],
     };
 
@@ -313,9 +460,7 @@ Komaya Pan (營業時間08:00 - 19:00)`,
               src={HERO_IMAGE}
               alt="立山連峰"
               className="h-full w-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-sand-50 via-black/10 to-black/25" />
             <div className="absolute left-4 bottom-4 right-4">
@@ -353,11 +498,7 @@ Komaya Pan (營業時間08:00 - 19:00)`,
     }
 
     function Card({ children, className }) {
-      return (
-        <div className={cx("rounded-xl2 bg-white shadow-soft ring-1 ring-sand-100", className)}>
-          {children}
-        </div>
-      );
+      return <div className={cx("rounded-xl2 bg-white shadow-soft ring-1 ring-sand-100", className)}>{children}</div>;
     }
 
     function Modal({ open, onClose, title, children }) {
@@ -370,27 +511,17 @@ Komaya Pan (營業時間08:00 - 19:00)`,
         return () => window.removeEventListener("keydown", onKey);
       }, [open, onClose]);
 
-      useEffect(() => {
-        if (open) setTimeout(() => ref.current?.focus(), 0);
-      }, [open]);
-
+      useEffect(() => { if (open) setTimeout(() => ref.current?.focus(), 0); }, [open]);
       if (!open) return null;
 
       return (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/35" onClick={onClose} />
           <div className="absolute inset-x-0 bottom-0 mx-auto max-w-md px-3 pb-3 safe-b">
-            <div
-              className="grain relative rounded-2xl bg-sand-50 shadow-soft2 ring-1 ring-sand-200 outline-none"
-              tabIndex={-1}
-              ref={ref}
-            >
+            <div className="grain relative rounded-2xl bg-sand-50 shadow-soft2 ring-1 ring-sand-200 outline-none" tabIndex={-1} ref={ref}>
               <div className="flex items-center justify-between px-4 pt-4">
                 <div className="text-base font-semibold">{title}</div>
-                <button
-                  onClick={onClose}
-                  className="rounded-full bg-white/80 px-3 py-1 text-sm ring-1 ring-sand-200 hover:bg-white"
-                >
+                <button onClick={onClose} className="rounded-full bg-white/80 px-3 py-1 text-sm ring-1 ring-sand-200 hover:bg-white">
                   關閉
                 </button>
               </div>
@@ -471,10 +602,7 @@ Komaya Pan (營業時間08:00 - 19:00)`,
         const loc = LOC_BY_DAY[dayKey] || LOC_BY_DAY["2026-01-01"];
         const cacheKey = `${dayKey}@${loc.lat},${loc.lon}`;
         const cached = cacheRef.current.get(cacheKey);
-        if (cached) {
-          setState({ status: "ok", data: cached, err: "" });
-          return;
-        }
+        if (cached) { setState({ status: "ok", data: cached, err: "" }); return; }
 
         let aborted = false;
         (async () => {
@@ -554,7 +682,7 @@ Komaya Pan (營業時間08:00 - 19:00)`,
       );
     }
 
-    // ---------- Schedule ----------
+    // ---------- Schedule UI ----------
     function DateStrip({ selected, onSelect }) {
       return (
         <div className="no-scrollbar -mx-4 overflow-x-auto px-4">
@@ -607,7 +735,7 @@ Komaya Pan (營業時間08:00 - 19:00)`,
       );
     }
 
-    function ScheduleTab({ scheduleByDay, updateNote }) {
+    function ScheduleTab({ scheduleByDay }) {
       const [dayKey, setDayKey] = useState(TRIP_DAYS[0].key);
       const [selectedItem, setSelectedItem] = useState(null);
       const items = scheduleByDay[dayKey] ?? [];
@@ -615,18 +743,15 @@ Komaya Pan (營業時間08:00 - 19:00)`,
       return (
         <div className="mx-auto max-w-md px-4 pb-28 pt-4">
           <DateStrip selected={dayKey} onSelect={setDayKey} />
-          <div className="mt-2">
-            <WeatherCard dayKey={dayKey} />
-          </div>
+          <div className="mt-2"><WeatherCard dayKey={dayKey} /></div>
           <div className="mt-4 flex items-center justify-between">
             <div className="text-base font-semibold">{TRIP_DAYS.find((d) => d.key === dayKey)?.label}</div>
             <div className="text-xs text-sand-500">{items.length} 個項目</div>
           </div>
           <div className="mt-3 space-y-3">
-            {items.map((it) => (
-              <TimelineItem key={it.id} item={it} onClick={() => setSelectedItem(it)} />
-            ))}
+            {items.map((it) => <TimelineItem key={it.id} item={it} onClick={() => setSelectedItem(it)} />)}
           </div>
+
           <Modal open={!!selectedItem} onClose={() => setSelectedItem(null)} title="行程詳情">
             {selectedItem && (
               <div className="space-y-3">
@@ -640,14 +765,24 @@ Komaya Pan (營業時間08:00 - 19:00)`,
                     {(CATEGORY[selectedItem.category] ?? CATEGORY.sight).label}
                   </span>
                 </div>
+
                 <Card className="p-3">
                   <div className="text-xs text-sand-500">備註</div>
-                  <div className="mt-2 w-full rounded-2xl bg-white px-3 py-3 text-sm leading-relaxed ring-1 ring-sand-100 text-sand-800 whitespace-pre-line">
+                  <div className="mt-2 whitespace-pre-wrap w-full rounded-2xl bg-white px-3 py-3 text-sm leading-relaxed ring-1 ring-sand-100 text-sand-800">
                     {selectedItem.note || "暫無備註"}
                   </div>
                 </Card>
+
                 <div className="flex gap-2">
-                  <a href={selectedItem.map || "#"} target="_blank" rel="noreferrer" className={cx("flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold shadow-soft ring-1 transition", selectedItem.map ? "bg-moss-600 text-white ring-moss-600 hover:bg-moss-700" : "bg-sand-100 text-sand-400 ring-sand-200 pointer-events-none")}>
+                  <a
+                    href={selectedItem.map || "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={cx(
+                      "flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold shadow-soft ring-1 transition",
+                      selectedItem.map ? "bg-moss-600 text-white ring-moss-600 hover:bg-moss-700" : "bg-sand-100 text-sand-400 ring-sand-200 pointer-events-none"
+                    )}
+                  >
                     打開地圖
                   </a>
                 </div>
@@ -782,15 +917,11 @@ Komaya Pan (營業時間08:00 - 19:00)`,
         }
       }
       const incoming = Object.fromEntries(PEOPLE.map((to) => [to, Object.fromEntries(PEOPLE.map((from) => [from, 0]))]));
-      for (const from of PEOPLE) {
-        for (const to of PEOPLE) incoming[to][from] = net[from][to];
-      }
+      for (const from of PEOPLE) for (const to of PEOPLE) incoming[to][from] = net[from][to];
       const transfers = [];
-      for (const from of PEOPLE) {
-        for (const to of PEOPLE) {
-          const amount = net[from][to];
-          if (from !== to && amount > 0) transfers.push({ from, to, amount });
-        }
+      for (const from of PEOPLE) for (const to of PEOPLE) {
+        const amount = net[from][to];
+        if (from !== to && amount > 0) transfers.push({ from, to, amount });
       }
       return { transfers, incoming };
     }
@@ -800,9 +931,7 @@ Komaya Pan (營業時間08:00 - 19:00)`,
       const [form, setForm] = useState({ dateKey: TRIP_DAYS[0].key, title: "", payer: "沈", total: "", allocations: { 沈: "", 瑄: "", YO: "" } });
 
       useEffect(() => {
-        expenseRef.on('value', (snapshot) => {
-          setEntries(snapshot.val() || []);
-        });
+        expenseRef.on("value", (snapshot) => setEntries(snapshot.val() || []));
         return () => expenseRef.off();
       }, []);
 
@@ -837,9 +966,7 @@ Komaya Pan (營業時間08:00 - 19:00)`,
         return { total, allocSum, remaining: total - allocSum };
       }, [form]);
 
-      const setAlloc = (name, value) => {
-        setForm((f) => ({ ...f, allocations: { ...f.allocations, [name]: value.replace(/[^\d]/g, "") } }));
-      };
+      const setAlloc = (name, value) => setForm((f) => ({ ...f, allocations: { ...f.allocations, [name]: value.replace(/[^\d]/g, "") } }));
 
       const splitEven = () => {
         const total = Number(form.total || 0);
@@ -852,18 +979,12 @@ Komaya Pan (營業時間08:00 - 19:00)`,
         const others = PEOPLE.filter((p) => p !== payer);
 
         const alloc = Object.fromEntries(PEOPLE.map((p) => [p, base]));
-
         if (rem > 0) {
           const shuffledOthers = [...others].sort(() => Math.random() - 0.5);
-          for (let k = 0; k < rem; k++) {
-            alloc[shuffledOthers[k]] += 1;
-          }
+          for (let k = 0; k < rem; k++) alloc[shuffledOthers[k]] += 1;
         }
 
-        setForm({
-          ...form,
-          allocations: Object.fromEntries(PEOPLE.map((p) => [p, String(alloc[p])]))
-        });
+        setForm({ ...form, allocations: Object.fromEntries(PEOPLE.map((p) => [p, String(alloc[p])])) });
       };
 
       const addEntry = () => {
@@ -872,7 +993,14 @@ Komaya Pan (營業時間08:00 - 19:00)`,
         if (!form.title.trim()) return alert("請輸入項目名稱");
         if (formNums.allocSum !== total) return alert(`分配加總：${formNums.allocSum}，總金額：${total}`);
         const id = "e" + Math.random().toString(16).slice(2);
-        const newEntry = { id, dateKey: form.dateKey, title: form.title.trim(), payer: form.payer, total, allocations: Object.fromEntries(PEOPLE.map((p) => [p, Number(form.allocations[p] || 0)])) };
+        const newEntry = {
+          id,
+          dateKey: form.dateKey,
+          title: form.title.trim(),
+          payer: form.payer,
+          total,
+          allocations: Object.fromEntries(PEOPLE.map((p) => [p, Number(form.allocations[p] || 0)]))
+        };
         expenseRef.set([...entries, newEntry]);
         setForm((f) => ({ ...f, title: "", total: "", allocations: { 沈: "", 瑄: "", YO: "" } }));
       };
@@ -897,6 +1025,7 @@ Komaya Pan (營業時間08:00 - 19:00)`,
                 <div className="mt-0.5 text-sm font-semibold">¥ {fmtInt(dashboard.sum)}</div>
               </div>
             </div>
+
             <div className="mt-4 space-y-4">
               {PEOPLE.map((name) => {
                 const value = totalsByPayer[name] || 0;
@@ -915,6 +1044,7 @@ Komaya Pan (營業時間08:00 - 19:00)`,
                 );
               })}
             </div>
+
             <div className="mt-4 rounded-2xl bg-white p-3 ring-1 ring-sand-100">
               <div className="text-xs text-sand-500">結算小卡</div>
               <div className="mt-1 text-sm text-sand-800 leading-relaxed">
@@ -943,26 +1073,45 @@ Komaya Pan (營業時間08:00 - 19:00)`,
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div className="col-span-2">
                 <label className="text-xs text-sand-500">日期</label>
-                <select value={form.dateKey} onChange={(e) => setForm((f) => ({ ...f, dateKey: e.target.value }))} className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100">
+                <select
+                  value={form.dateKey}
+                  onChange={(e) => setForm((f) => ({ ...f, dateKey: e.target.value }))}
+                  className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                >
                   {TRIP_DAYS.map((d) => <option key={d.key} value={d.key}>{d.label}</option>)}
                 </select>
               </div>
 
               <div className="col-span-2">
                 <label className="text-xs text-sand-500">項目</label>
-                <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="例如：午餐、車票、無印、門票…" className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100" />
+                <input
+                  value={form.title}
+                  onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                  placeholder="例如：午餐、車票、無印、門票…"
+                  className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                />
               </div>
 
               <div>
                 <label className="text-xs text-sand-500">付款人</label>
-                <select value={form.payer} onChange={(e) => setForm((f) => ({ ...f, payer: e.target.value }))} className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100">
+                <select
+                  value={form.payer}
+                  onChange={(e) => setForm((f) => ({ ...f, payer: e.target.value }))}
+                  className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                >
                   {PEOPLE.map((p) => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
 
               <div>
                 <label className="text-xs text-sand-500">總金額（¥）</label>
-                <input value={form.total} onChange={(e) => setForm((f) => ({ ...f, total: e.target.value.replace(/[^\d]/g, "") }))} inputMode="numeric" placeholder="數字" className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100" />
+                <input
+                  value={form.total}
+                  onChange={(e) => setForm((f) => ({ ...f, total: e.target.value.replace(/[^\d]/g, "") }))}
+                  inputMode="numeric"
+                  placeholder="數字"
+                  className="mt-1 w-full rounded-2xl bg-sand-50 px-3 py-3 text-sm ring-1 ring-sand-100"
+                />
               </div>
 
               <div className="col-span-2">
@@ -970,13 +1119,20 @@ Komaya Pan (營業時間08:00 - 19:00)`,
                   <label className="text-xs text-sand-500">分配</label>
                   <div className={cx("text-xs", formNums.remaining === 0 ? "text-moss-700" : "text-clay-700")}>剩餘：¥ {fmtInt(formNums.remaining)}</div>
                 </div>
+
                 <div className="mt-2 space-y-2">
                   {PEOPLE.map((p) => (
                     <div key={p} className="flex items-center justify-between gap-2 rounded-2xl bg-white px-3 py-3 ring-1 ring-sand-100">
                       <div className="text-sm font-semibold">{p}</div>
                       <div className="flex items-center gap-2">
                         <div className="text-xs text-sand-500">¥</div>
-                        <input value={form.allocations[p]} onChange={(e) => setAlloc(p, e.target.value)} inputMode="numeric" placeholder="0" className="w-28 rounded-xl bg-sand-50 px-3 py-2 text-sm text-right ring-1 ring-sand-100" />
+                        <input
+                          value={form.allocations[p]}
+                          onChange={(e) => setAlloc(p, e.target.value)}
+                          inputMode="numeric"
+                          placeholder="0"
+                          className="w-28 rounded-xl bg-sand-50 px-3 py-2 text-sm text-right ring-1 ring-sand-100"
+                        />
                       </div>
                     </div>
                   ))}
@@ -1041,43 +1197,15 @@ Komaya Pan (營業時間08:00 - 19:00)`,
 
     // ---------- App Shell ----------
     function App() {
-      const savedNotes = useMemo(() => loadJSON("trip_notes_map_v1", {}), []);
-      const [scheduleByDay, setScheduleByDay] = useState(() => {
-        const cloned = JSON.parse(JSON.stringify(INITIAL_SCHEDULE));
-        for (const dayKey of Object.keys(cloned)) {
-          for (const item of cloned[dayKey]) {
-            const key = `${dayKey}::${item.id}`;
-            if (savedNotes[key] != null) item.note = savedNotes[key];
-          }
-        }
-        return cloned;
-      });
-
-      const updateNote = (dayKey, itemId, note) => {
-        setScheduleByDay((prev) => {
-          const next = JSON.parse(JSON.stringify(prev));
-          const arr = next[dayKey] || [];
-          const idx = arr.findIndex((x) => x.id === itemId);
-          if (idx >= 0) arr[idx].note = note;
-          return next;
-        });
-        const key = `${dayKey}::${itemId}`;
-        const nextNotes = { ...loadJSON("trip_notes_map_v1", {}), [key]: note };
-        saveJSON("trip_notes_map_v1", nextNotes);
-      };
-
+      const [scheduleByDay] = useState(() => JSON.parse(JSON.stringify(INITIAL_SCHEDULE)));
       const [tab, setTab] = useState("schedule");
-      const subtitle = useMemo(() => {
-        if (tab === "schedule") return "行程";
-        if (tab === "bookings") return "預訂";
-        return "記帳";
-      }, [tab]);
+      const subtitle = useMemo(() => (tab === "schedule" ? "行程" : tab === "bookings" ? "預訂" : "記帳"), [tab]);
 
       return (
         <div className="min-h-screen">
           <Hero />
           <TopBar subtitle={subtitle} />
-          {tab === "schedule" && <ScheduleTab scheduleByDay={scheduleByDay} updateNote={updateNote} />}
+          {tab === "schedule" && <ScheduleTab scheduleByDay={scheduleByDay} />}
           {tab === "bookings" && <BookingsTab />}
           {tab === "expense" && <ExpenseTab />}
           <TabBar tab={tab} setTab={setTab} />
